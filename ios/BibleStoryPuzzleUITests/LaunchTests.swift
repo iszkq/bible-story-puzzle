@@ -38,10 +38,13 @@ final class LaunchTests: XCTestCase {
         app.buttons["浏览故事"].firstMatch.tap()
         app.buttons["我的故事集"].firstMatch.tap()
         app.buttons["新建"].firstMatch.tap()
-        let add = app.webViews.buttons["添加图片"].firstMatch
-        // The file input is nested in an accessible label in WebKit.
-        if add.exists { add.tap() }
-        else { app.webViews.staticTexts["添加图片"].firstMatch.tap() }
+        // WebKit appends its localized file-input description to this label.
+        // Tap the actual control rather than its covered StaticText child.
+        let add = app.webViews.buttons.matching(
+            NSPredicate(format: "label CONTAINS %@", "添加图片")
+        ).firstMatch
+        XCTAssertTrue(add.waitForExistence(timeout: 10))
+        add.tap()
         XCTAssertTrue(app.buttons["照片图库"].firstMatch.waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["文件"].firstMatch.exists)
         app.buttons["取消"].firstMatch.tap()
