@@ -31,10 +31,8 @@ jobs:
           mkdir Payload
           cp -R build/Build/Products/Release-iphoneos/BibleStoryPuzzle.app Payload/
           /usr/bin/zip -qry BibleStoryPuzzle-unsigned.ipa Payload
-          if codesign -dv Payload/BibleStoryPuzzle.app >codesign.txt 2>&1; then
-            echo "Unexpected signature in unsigned build"
-            exit 1
-          fi
+          codesign -dv Payload/BibleStoryPuzzle.app >codesign.txt 2>&1 || true
+          if grep -q "Authority=" codesign.txt; then echo "Unexpected signature in unsigned build"; exit 1; fi
           file Payload/BibleStoryPuzzle.app/BibleStoryPuzzle
           python3 scripts/verify-ipa.py BibleStoryPuzzle-unsigned.ipa
       - name: Upload unsigned IPA

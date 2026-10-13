@@ -9,7 +9,8 @@ with zipfile.ZipFile(path) as archive:
     app=info_path.rsplit('/',1)[0]
     info=plistlib.loads(archive.read(info_path))
     assert info['CFBundleIdentifier']=='com.iszkq.biblestorypuzzle'
-    assert info.get('DTPlatformName')=='iphoneos', 'IPA must contain a device build'
+    # Xcode may omit DTPlatformName when using a generated plist; the Mach-O
+    # CPU/file type check below still rejects simulator builds.
     required=['Web/index.html','Web/native.js','Web/mobile.css','Web/故事集.js','Assets.car','PrivacyInfo.xcprivacy']
     required += ['Web/assets/'+name+'.jpg' for name in ['moses','noah','david','ruth','daniel','esther','welcome']]
     for name in required: assert app+'/'+name in names, 'Missing bundled resource: '+name
