@@ -59,7 +59,7 @@ jobs:
           echo "Test app built; installing"
           xcrun simctl install "$PUZZLE_SIMULATOR" simulator-build/Build/Products/Debug-iphonesimulator/BibleStoryPuzzle.app
           echo "App installed; launching"
-          xcrun simctl launch "$PUZZLE_SIMULATOR" com.iszkq.biblestorypuzzle
+          xcrun simctl launch "$PUZZLE_SIMULATOR" com.iszkq.biblestorypuzzle --diagnostics
           sleep 15
           curl --max-time 15 -v http://127.0.0.1:18765/index.html -o launch-page.html 2>local-server.log || true
           xcrun simctl io "$PUZZLE_SIMULATOR" screenshot simulator-launch.png

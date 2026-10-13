@@ -13,7 +13,7 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
     private var player: AVAudioPlayer?
     private var importInProgress = false
     private let diagnostics = UILabel()
-    private var isUITesting: Bool { ProcessInfo.processInfo.arguments.contains("--uitesting-reset") }
+    private var isUITesting: Bool { ProcessInfo.processInfo.arguments.contains("--uitesting-reset") || ProcessInfo.processInfo.arguments.contains("--diagnostics") }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +66,7 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
                 self?.diagnostics.text = "Local server ready, loading WebKit"
                 self?.webView.load(URLRequest(url: LocalAssetServer.origin.appendingPathComponent("index.html")))
             case .failure(let error):
+                NSLog("Puzzle local server failed: %@", String(describing: error))
                 self?.diagnostics.text = "Server failed: \(error)"
                 self?.showStartupError()
             }
@@ -93,7 +94,11 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
         }
     }
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) { loading.startAnimating(); webView.reload() }
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { showStartupError() }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        NSLog("Puzzle WebKit load failed: %@", error.localizedDescription)
+        diagnostics.text = error.localizedDescription
+        showStartupError()
+    }
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         let url = navigationAction.request.url
         decisionHandler(url?.host == "127.0.0.1" && url?.port == 18765 && url?.scheme == "http" ? .allow : .cancel)

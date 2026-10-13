@@ -16,7 +16,9 @@ final class LocalAssetServer {
         do {
             let parameters = NWParameters.tcp
             parameters.requiredLocalEndpoint = .hostPort(host: .ipv4(.loopback), port: 18765)
-            let listener = try NWListener(using: parameters, on: 18765)
+            // requiredLocalEndpoint owns both address and port. Passing an
+            // additional port to NWListener replaces that endpoint on iOS.
+            let listener = try NWListener(using: parameters)
             self.listener = listener
             var reported = false
             listener.stateUpdateHandler = { state in
