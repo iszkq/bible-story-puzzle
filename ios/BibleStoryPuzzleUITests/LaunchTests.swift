@@ -2,6 +2,13 @@ import XCTest
 
 final class LaunchTests: XCTestCase {
     override func setUpWithError() throws { continueAfterFailure = false }
+    override func tearDownWithError() throws {
+        let app = XCUIApplication()
+        print("App accessibility tree: \(app.debugDescription)")
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.lifetime = .keepAlways
+        add(attachment)
+    }
 
     func testOfflineLaunchAndOriginalPreview() {
         let app = XCUIApplication()

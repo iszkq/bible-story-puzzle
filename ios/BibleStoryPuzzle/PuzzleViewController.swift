@@ -12,6 +12,8 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
     private var loading = UIActivityIndicatorView(style: .large)
     private var player: AVAudioPlayer?
     private var importInProgress = false
+    private let diagnostics = UILabel()
+    private var isUITesting: Bool { ProcessInfo.processInfo.arguments.contains("--uitesting-reset") }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,6 +40,16 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
         view.addSubview(loading)
         NSLayoutConstraint.activate([loading.centerXAnchor.constraint(equalTo: view.centerXAnchor), loading.centerYAnchor.constraint(equalTo: view.centerYAnchor)])
         loading.startAnimating()
+        if isUITesting {
+            diagnostics.accessibilityIdentifier = "startup-diagnostics"
+            diagnostics.text = "Preparing local assets"
+            diagnostics.numberOfLines = 0
+            diagnostics.font = .systemFont(ofSize: 10)
+            diagnostics.frame = CGRect(x: 8, y: 0, width: 350, height: 30)
+            view.addSubview(diagnostics)
+            let script = "window.puzzleErrors=[]; window.addEventListener('error',e=>window.puzzleErrors.push(e.message+' at '+e.filename+':'+e.lineno));"
+            config.userContentController.addUserScript(WKUserScript(source: script, injectionTime: .atDocumentStart, forMainFrameOnly: true))
+        }
         NotificationCenter.default.addObserver(self, selector: #selector(saveState), name: UIApplication.willResignActiveNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(saveState), name: UIApplication.didEnterBackgroundNotification, object: nil)
         if ProcessInfo.processInfo.arguments.contains("--uitesting-reset") {
@@ -50,8 +62,12 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
         server = LocalAssetServer(root: root)
         server?.start { [weak self] result in
             switch result {
-            case .success: self?.webView.load(URLRequest(url: LocalAssetServer.origin.appendingPathComponent("index.html")))
-            case .failure: self?.showStartupError()
+            case .success:
+                self?.diagnostics.text = "Local server ready, loading WebKit"
+                self?.webView.load(URLRequest(url: LocalAssetServer.origin.appendingPathComponent("index.html")))
+            case .failure(let error):
+                self?.diagnostics.text = "Server failed: \(error)"
+                self?.showStartupError()
             }
         }
     }
@@ -68,7 +84,14 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
 
     @objc private func saveState() { webView?.evaluateJavaScript("window.persistNativeState?.()", completionHandler: nil) }
 
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { loading.stopAnimating(); updateTheme() }
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        loading.stopAnimating(); updateTheme()
+        if isUITesting {
+            webView.evaluateJavaScript("JSON.stringify({title:document.title,text:document.getElementById('screen')?.innerText,errors:window.puzzleErrors})") { [weak self] result, error in
+                self?.diagnostics.text = (result as? String) ?? error?.localizedDescription ?? "WebKit finished"
+            }
+        }
+    }
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) { loading.startAnimating(); webView.reload() }
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) { showStartupError() }
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {

@@ -46,13 +46,14 @@ jobs:
       - name: Select available iPhone simulator
         run: python3 scripts/simulator-destination.py >> "$GITHUB_ENV"
       - name: Test offline launch and native picker bridge
+        timeout-minutes: 6
         shell: bash
         run: |
           set -euo pipefail
           xcodebuild -project ios/BibleStoryPuzzle.xcodeproj \
             -scheme BibleStoryPuzzle -configuration Debug \
             -destination "id=$PUZZLE_SIMULATOR" -derivedDataPath simulator-build \
-            -parallel-testing-enabled NO -maximum-test-execution-time-allowance 90 \
+            -parallel-testing-enabled NO -maximum-test-execution-time-allowance 90 -test-timeouts-enabled YES \
             -resultBundlePath ui-tests.xcresult test >build-simulator.log 2>&1 || { tail -120 build-simulator.log; exit 1; }
       - name: Upload diagnostics
         if: always()
