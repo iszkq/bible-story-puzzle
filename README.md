@@ -4,6 +4,8 @@
 
 项目也支持“我的故事集”：批量导入 JPEG、PNG 或 WebP，裁切为 4:3 或用中性边框保留完整画面，编辑标题／故事／出处／可选三选一问题，排序、选封面，试玩 12／24／48 块并保存草稿。内容、图片版本、进度和收藏都只在当前设备保存，不上传服务器。
 
+下载：[v0.5.0 未签名 iOS IPA](https://github.com/iszkq/bible-story-puzzle/releases/tag/v0.5.0)。最低 iOS 16，iPhone 竖屏；安装到普通 iPhone 前需签名。已通过 125 项网页检查和 2 项 iPhone 模拟器 UI 检查，详见 `docs/iOS实现与构建状态.md`。
+
 ## 目录
 
 - `web/`：可离线运行的共享游戏页面。设计检查可使用 `index.html?prototype=1`；默认入口是移动 App 视图。

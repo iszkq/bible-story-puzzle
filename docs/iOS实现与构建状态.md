@@ -21,8 +21,10 @@
 
 本机 Windows 上通过了 37 项自建故事集检查、21 项官方网格／裁切检查、67 项移动页面／桥接／恢复检查（共 125 项），以及工程对象引用、共享 scheme、plist、图标、准确离线资源拷贝和设计契约检查。浏览器检查使用 Edge／Chromium，不能代表 iOS WebKit 或真机性能。
 
-当前机器没有 Xcode。GitHub CLI 的 iszkq 登录失效，Git 凭据管理器没有可用凭据，实际 push 未通过认证，因此尚未上传远程、未运行 macOS 编译、尚未生成 IPA。工程静态检查不等于 Swift 编译成功；最终编译／模拟器结果以 Actions 记录为准。
+2026-10-14 已上传 `main`，并通过 GitHub Actions macOS / Xcode 15.4 实际编译和模拟器验证。已验证代码提交 `4da7b01`。iOS 构建记录：https://github.com/iszkq/bible-story-puzzle/actions/runs/38433611795 ，网页检查记录：https://github.com/iszkq/bible-story-puzzle/actions/runs/38433611790 。两项 XCUI 检查分别验证离线欢迎页→完整预览→进入拼图，以及我的故事集→新建→原生照片／文件入口菜单。两项都通过；这不代表已在真机完成选取照片与导入的端到端测试。
 
-完成本机 `gh auth login` 后，推送 `main` 会自动启动两项 Actions。IPA 名称为 `BibleStoryPuzzle-unsigned.ipa`，位于 `BibleStoryPuzzle-unsigned-ipa` 构建产物中。它必须经过签名才能安装到普通 iPhone。
+已生成真正的 ARM64 iPhone 设备 IPA，严格检查 `iphoneos` 平台、可执行文件、中文资源路径、全部七幅场景图片与隐私清单，确认没有签名目录、配置文件或 Mach-O 签名命令。IPA 名称为 `BibleStoryPuzzle-unsigned.ipa`，SHA256 为 `948907ae4d751581b26e7a6ceb2f29e4968ebc332759047da46df0d55abacb74`。下载入口：https://github.com/iszkq/bible-story-puzzle/releases/tag/v0.5.0 。它必须经过签名才能安装到普通 iPhone。
+
+修复了 iOS Network.framework 监听参数冲突，模拟器实际离线页面返回 HTTP 200。启动诊断仅在测试参数下出现，正常应用不展示诊断文字。后续推送 `main` 会自动运行网页检查和 iOS 构建；包与启动截图、日志、XCUI 结果保存在 Actions 产物中。
 
 仍需 iPhone 实测：PHPicker／文件读取、系统大字、VoiceOver 网格移动、48 块拖动／滚动、长时间内存、强制终止／恢复，以及图片内容专家审阅。远程分享、云同步与公开社区未实现。
