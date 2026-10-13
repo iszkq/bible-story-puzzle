@@ -88,7 +88,8 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
             color.resolvedColor(with: traitCollection).getRed(&r, green: &g, blue: &b, alpha: &a)
             return "rgba(\(Int(r*255)),\(Int(g*255)),\(Int(b*255)),\(a))"
         }
-        webView.callAsyncJavaScript("window.applyNativeTheme(colors)", arguments: ["colors":colors], in: nil, in: .page, completionHandler: nil)
+        let textScale = min(2.5, UIFont.preferredFont(forTextStyle: .body).pointSize / 17)
+        webView.callAsyncJavaScript("window.applyNativeTheme(colors); window.applyNativeTextScale(scale)", arguments: ["colors":colors, "scale":textScale], in: nil, in: .page, completionHandler: nil)
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -187,9 +188,11 @@ final class PuzzleViewController: UIViewController, WKScriptMessageHandler, WKNa
               let height = properties[kCGImagePropertyPixelHeight] as? Int,
               width > 0, height > 0, Double(width)*Double(height) <= 40_000_000 else { return nil }
         let options: [CFString:Any] = [kCGImageSourceCreateThumbnailFromImageAlways:true, kCGImageSourceCreateThumbnailWithTransform:true, kCGImageSourceThumbnailMaxPixelSize:2560, kCGImageSourceShouldCacheImmediately:true]
-        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary),
-              let jpeg = UIImage(cgImage:image).jpegData(compressionQuality:0.94) else { return nil }
-        return ["name":url.deletingPathExtension().lastPathComponent+".jpg", "mime":"image/jpeg", "base64":jpeg.base64EncodedString()]
+        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+        let alpha = [CGImageAlphaInfo.first, .last, .premultipliedFirst, .premultipliedLast].contains(image.alphaInfo)
+        let data = alpha ? UIImage(cgImage:image).pngData() : UIImage(cgImage:image).jpegData(compressionQuality:0.94)
+        guard let data else { return nil }
+        return ["name":url.deletingPathExtension().lastPathComponent+(alpha ? ".png" : ".jpg"), "mime":alpha ? "image/png" : "image/jpeg", "base64":data.base64EncodedString()]
     }
 
     private func deliver(_ image: [String:String], input: String, completion: @escaping () -> Void) {

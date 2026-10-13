@@ -31,15 +31,29 @@ const ok=(v,t)=>{if(!v)throw Error(t);report.checks.push(t);};
   }
   // Exercise native bridge with a test host, including import and equal feedback
   // for wrong and correct cells. This does not replace simulator testing.
-  const page=await browser.newPage({viewport:{width:393,height:852}});
+  const bridgeContext=await browser.newContext({viewport:{width:393,height:852}});
+  const page=await bridgeContext.newPage();
   await page.addInitScript(()=>{window.nativeEvents=[];window.webkit={messageHandlers:{puzzle:{postMessage:m=>window.nativeEvents.push(m)}}};});
   await page.goto('http://127.0.0.1:8766/index.html');await page.waitForFunction(()=>creator.ready);
   await page.evaluate(()=>{storyID=1;count=12;makeCurrent();go('puzzle');dropPiece(0,.4,.2);dropPiece(1,.4,.2);});
   ok(await page.evaluate(()=>nativeEvents.filter(e=>e.type==='feedback').every(e=>e.event==='place')),'native placement feedback is identical for every cell');
   await page.evaluate(()=>{go('mysets');newDraft();});
   const base64=fs.readFileSync(path.resolve(__dirname,'../web/assets/ruth.jpg')).toString('base64');
+  await page.locator('.file-button').first().click();
+  ok(await page.evaluate(()=>nativeEvents.some(e=>e.type==='pickImages'&&e.inputID==='add-images')),'native add-photo control opens picker instead of browser upload dialog');
   await page.evaluate(async base64=>{await receiveNativeImages('add-images',[{name:'ruth.jpg',mime:'image/jpeg',base64}]);},base64);
   ok(await page.evaluate(()=>creator.draft.items.length)===1,'native photo bridge uses shared creator import pipeline');
+  const context=page.context();
+  const backup=await page.evaluate(()=>JSON.stringify(state.current));
+  await page.evaluate(async()=>{creator.itemID=creator.draft.items[0].id;await beginTrial();});
+  ok(await page.evaluate(()=>!!creator.trial),'native editor starts isolated trial');
+  await page.close();
+  const reopened=await context.newPage();
+  await reopened.goto('http://127.0.0.1:8766/index.html');await reopened.waitForFunction(()=>creator.ready);
+  ok(await reopened.evaluate(()=>JSON.stringify(state.current))===backup,'closing the view during trial restores previous real game on reopen');
+  await reopened.evaluate(()=>applyNativeTextScale(2));
+  await reopened.evaluate(()=>go('reveal'));
+  ok(await reopened.locator('.reader').evaluate(e=>parseFloat(getComputedStyle(e).fontSize))===34,'reading text honors native accessibility text scale');
   ok(!report.errors.length,'mobile flow has no script errors');
   fs.writeFileSync(path.resolve(__dirname,'../test-results/mobile-qa.json'),JSON.stringify(report,null,2));
   console.log(JSON.stringify(report,null,2));

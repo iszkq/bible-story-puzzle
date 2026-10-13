@@ -5,6 +5,7 @@ function nativePost(message){nativeHost?.postMessage(message);}
 window.applyNativeTheme=function(colors){
  for(const [key,value] of Object.entries(colors))document.documentElement.style.setProperty('--'+key,value);
 };
+window.applyNativeTextScale=function(scale){document.documentElement.style.setProperty('--reading-scale',String(scale));};
 window.receiveNativeImages=async function(inputID,images){
  // Use the same decode, crop and versioning pipeline as browser file imports.
  const files=images.map((item)=>{

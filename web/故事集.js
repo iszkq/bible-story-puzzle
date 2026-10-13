@@ -150,9 +150,9 @@ function collectionHTML(){
 async function beginTrial(){
  const i=draftItem(),error=validateItem(i);if(error){reportCreator(error);return;}
  creator.busy=true;clearTimeout(draftTimer);render();
- try{await processScene(i);await writeLibrary();const v=makeVersion(i,'trial',versionID());creator.versions.push(v);refreshCustomStories();creator.trial={current:structuredClone(state.current),storyID,count};sessionStorage.setItem('bibleCreatorTrialBackup',JSON.stringify(creator.trial));storyID=v.id;count=i.difficulty;makeCurrent();creator.busy=false;go('puzzle');}catch(e){creator.busy=false;creator.notice=storageError(e);render();}
+ try{await processScene(i);await writeLibrary();const v=makeVersion(i,'trial',versionID());creator.versions.push(v);refreshCustomStories();creator.trial={current:structuredClone(state.current),storyID,count};localStorage.setItem('bibleCreatorTrialBackup',JSON.stringify(creator.trial));storyID=v.id;count=i.difficulty;makeCurrent();creator.busy=false;go('puzzle');}catch(e){creator.busy=false;creator.notice=storageError(e);render();}
 }
-function endTrial(){const backup=creator.trial;if(!backup)return;state.current=backup.current;storyID=backup.storyID;count=backup.count;creator.versions=creator.versions.filter(v=>v.setID!=='trial');creator.trial=null;sessionStorage.removeItem('bibleCreatorTrialBackup');refreshCustomStories();persist();creatorGo('imageedit');}
+function endTrial(){const backup=creator.trial;if(!backup)return;state.current=backup.current;storyID=backup.storyID;count=backup.count;creator.versions=creator.versions.filter(v=>v.setID!=='trial');creator.trial=null;localStorage.removeItem('bibleCreatorTrialBackup');refreshCustomStories();persist();creatorGo('imageedit');}
 document.addEventListener('input',e=>{
  if(creator.busy)return;
  const t=e.target;if(t.dataset.draft&&creator.draft){creator.draft[t.dataset.draft]=t.value;saveDraftSoon();return;}
@@ -206,5 +206,5 @@ document.addEventListener('click',async e=>{
  if(isCustom(storyID)&&action==='toGuess'&&current()?.submitResult==='correct'&&!story().quizEnabled){e.stopImmediatePropagation();state.current.phase='reveal';persist();go('reveal');return;}
  if(isCustom(storyID)&&action==='answer'){e.stopImmediatePropagation();chosen=decodeURIComponent([arg,...rest].join(':'));result='';state.current.chosen=chosen;state.current.result='';persist();render();return;}
 },true);
-function recoverTrial(){try{const backup=JSON.parse(sessionStorage.getItem('bibleCreatorTrialBackup'));if(backup){state.current=backup.current;storyID=backup.storyID;count=backup.count;sessionStorage.removeItem('bibleCreatorTrialBackup');persist();}}catch(e){}}
+function recoverTrial(){try{const backup=JSON.parse(localStorage.getItem('bibleCreatorTrialBackup'));if(backup){state.current=backup.current;storyID=backup.storyID;count=backup.count;localStorage.removeItem('bibleCreatorTrialBackup');persist();}}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&creator.ready&&creator.draft&&!creator.busy){clearTimeout(draftTimer);writeLibrary().catch(e=>{creator.storage=storageError(e);});}});

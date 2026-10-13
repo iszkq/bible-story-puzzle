@@ -307,6 +307,8 @@
     "offline_origin": "http://127.0.0.1:18765",
     "mobile_entry": "web/index.html (default); ?prototype=1 for design inspection",
     "native_import": "PHPicker and UIDocumentPicker; selected files only",
-    "signing": "unsigned device build in macOS GitHub Actions"
+    "signing": "unsigned device build in macOS GitHub Actions",
+    "trial_backup": "persistent localStorage backup restored on WebView rebuild or cold launch",
+    "text_size": "native Dynamic Type scale for reading, headings, questions and form input"
   }
 }
