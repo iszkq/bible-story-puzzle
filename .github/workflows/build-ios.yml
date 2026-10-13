@@ -46,15 +46,26 @@ jobs:
       - name: Select available iPhone simulator
         run: python3 scripts/simulator-destination.py >> "$GITHUB_ENV"
       - name: Test offline launch and native picker bridge
-        timeout-minutes: 6
+        timeout-minutes: 9
         shell: bash
         run: |
           set -euo pipefail
+          xcrun simctl boot "$PUZZLE_SIMULATOR" || true
+          xcrun simctl bootstatus "$PUZZLE_SIMULATOR" -b
+          xcodebuild -project ios/BibleStoryPuzzle.xcodeproj \
+            -scheme BibleStoryPuzzle -configuration Debug -destination "id=$PUZZLE_SIMULATOR" \
+            -derivedDataPath simulator-build ONLY_ACTIVE_ARCH=YES build-for-testing >build-simulator.log 2>&1 || { tail -80 build-simulator.log; exit 1; }
+          xcrun simctl install "$PUZZLE_SIMULATOR" simulator-build/Build/Products/Debug-iphonesimulator/BibleStoryPuzzle.app
+          xcrun simctl launch "$PUZZLE_SIMULATOR" com.iszkq.biblestorypuzzle
+          sleep 15
+          curl --max-time 15 -v http://127.0.0.1:18765/index.html -o launch-page.html 2>local-server.log || true
+          xcrun simctl io "$PUZZLE_SIMULATOR" screenshot simulator-launch.png
+          xcrun simctl terminate "$PUZZLE_SIMULATOR" com.iszkq.biblestorypuzzle || true
           xcodebuild -project ios/BibleStoryPuzzle.xcodeproj \
             -scheme BibleStoryPuzzle -configuration Debug \
             -destination "id=$PUZZLE_SIMULATOR" -derivedDataPath simulator-build \
             -parallel-testing-enabled NO -maximum-test-execution-time-allowance 90 -test-timeouts-enabled YES \
-            -resultBundlePath ui-tests.xcresult test >build-simulator.log 2>&1 || { tail -120 build-simulator.log; exit 1; }
+            -resultBundlePath ui-tests.xcresult test-without-building >>build-simulator.log 2>&1 || { tail -120 build-simulator.log; exit 1; }
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
@@ -65,3 +76,6 @@ jobs:
             build-simulator.log
             ui-tests.xcresult
             codesign.txt
+            simulator-launch.png
+            local-server.log
+            launch-page.html
