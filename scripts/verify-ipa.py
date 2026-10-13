@@ -8,7 +8,7 @@ with zipfile.ZipFile(path) as archive:
     info_path=next(n for n in names if n.startswith('Payload/') and n.count('/')==2 and n.endswith('/Info.plist'))
     app=info_path.rsplit('/',1)[0]
     info=plistlib.loads(archive.read(info_path))
-    assert info['CFBundleIdentifier']=='com.iszkq.biblestorypuzzle'
+    assert info['CFBundleIdentifier']=='com.iszkq.biblestorypuzzle', info.get('CFBundleIdentifier')
     # Xcode may omit DTPlatformName when using a generated plist; the Mach-O
     # CPU/file type check below still rejects simulator builds.
     required=['Web/index.html','Web/native.js','Web/mobile.css','Web/故事集.js','Assets.car','PrivacyInfo.xcprivacy']

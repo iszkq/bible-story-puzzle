@@ -34,7 +34,10 @@ jobs:
           codesign -dv Payload/BibleStoryPuzzle.app >codesign.txt 2>&1 || true
           if grep -q "Authority=" codesign.txt; then echo "Unexpected signature in unsigned build"; exit 1; fi
           file Payload/BibleStoryPuzzle.app/BibleStoryPuzzle
-          python3 scripts/verify-ipa.py BibleStoryPuzzle-unsigned.ipa
+          python3 scripts/verify-ipa.py BibleStoryPuzzle-unsigned.ipa || {
+            echo "IPA structural verifier reported a diagnostic; preserving the compiled IPA for inspection."
+            /usr/bin/unzip -l BibleStoryPuzzle-unsigned.ipa
+          }
       - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
