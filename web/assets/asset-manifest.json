@@ -1,0 +1,74 @@
+[
+  {
+    "name": "moses",
+    "source": "user-provided attachment",
+    "original": "originals/moses.png",
+    "size": [
+      1448,
+      1086
+    ]
+  },
+  {
+    "name": "noah",
+    "source": "user-provided attachment",
+    "original": "originals/noah.png",
+    "size": [
+      1448,
+      1086
+    ]
+  },
+  {
+    "name": "david",
+    "source": "user-provided attachment",
+    "original": "originals/david.png",
+    "size": [
+      1448,
+      1086
+    ]
+  },
+  {
+    "name": "ruth",
+    "source": "user-provided attachment",
+    "original": "originals/ruth.png",
+    "size": [
+      1448,
+      1086
+    ]
+  },
+  {
+    "name": "daniel",
+    "source": "user-provided attachment",
+    "original": "originals/daniel.png",
+    "size": [
+      1448,
+      1086
+    ]
+  },
+  {
+    "name": "esther",
+    "source": "user-provided attachment",
+    "original": "originals/esther.png",
+    "size": [
+      1448,
+      1086
+    ]
+  },
+  {
+    "name": "icon",
+    "source": "user-provided attachment",
+    "original": "originals/icon.png",
+    "size": [
+      1254,
+      1254
+    ]
+  },
+  {
+    "name": "welcome",
+    "source": "user-provided attachment",
+    "original": "originals/welcome.png",
+    "size": [
+      1448,
+      1086
+    ]
+  }
+]

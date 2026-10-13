@@ -1,0 +1,19 @@
+/* Native safe areas are provided by the SwiftUI host, not a simulated phone. */
+html.app{height:100%;--page-inset:20px;--tab-bottom:8px}
+.app body{height:100%;overflow:hidden;background:var(--bg);-webkit-text-size-adjust:100%}
+.app .workspace{display:block;max-width:none;padding:0;height:100%}
+.app .sidebar,.app .notes,.app .status,.app .home-indicator{display:none}
+.app .device{height:100%;max-width:none;border:0;border-radius:0;box-shadow:none;margin:0}
+.app .viewport{height:100%;height:100dvh;overflow:hidden}
+.app .screen{padding:8px var(--page-inset) 24px;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+.app .screen.puzzle-screen{padding-bottom:0}
+.app .tabbar{padding:8px 0 var(--tab-bottom)}
+.app .sheet{padding-bottom:24px}
+.app .field input,.app .field textarea,.app .field select{font-size:17px}
+.app button{-webkit-tap-highlight-color:transparent}
+.app .explain{line-height:1.65}
+/* Safari browser safe areas; native view is already inside them. */
+.app:not(.native) .workspace{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.app:not(.native) .viewport{height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+@media(max-width:375px){html.app{--page-inset:16px}.app .bar{margin-bottom:8px}}
+@media(min-width:700px){.app .device{max-width:520px}.app body{background:var(--bg)}}

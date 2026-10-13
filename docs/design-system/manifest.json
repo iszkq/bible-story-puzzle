@@ -1,0 +1,312 @@
+{
+  "version": 7,
+  "updated_at": "2026-10-13",
+  "system_origin": "greenfield",
+  "product": {
+    "name": "拼见圣经（暂名）",
+    "category": "圣经故事拼图与人物识别",
+    "audience": "主要成人，用户明确选择",
+    "platforms": [
+      "iOS iPhone；iPad为可选适配"
+    ],
+    "primary_workflows": [
+      "选故事→预览→自由拖动拼图→提交→整体校验→识别人物→揭晓故事→收藏",
+      "中断后继续",
+      "收藏后重玩",
+      "我的故事集→创建/编辑→批量选图→裁切或保留整图→排序/封面/文字/可选题目→试玩→本地保存→自由拼图"
+    ],
+    "english_name": "Bible Story Puzzle",
+    "suggested_repository_name": "bible-story-puzzle",
+    "github_repository": "https://github.com/iszkq/bible-story-puzzle",
+    "minimum_ios": "16.0"
+  },
+  "sources": {
+    "brief": [
+      "用户要求详细设计流程稿和iOS页面规划",
+      "用户强调素材品质",
+      "用户明确主要成人受众",
+      "2026-10-13 用户明确界面主题改为iOS系统色，并要求用imagegen生成并接入素材",
+      "用户要求玩家能随时查看完整预览图，对照乱序碎片拼图",
+      "用户要求自建故事集、上传自己的图片并试玩",
+      "用户要求准备页完整原图、按难度划格并中性吸附、托盘多行显示"
+    ],
+    "references": [
+      "reference-board.md"
+    ],
+    "figma": [],
+    "website": [],
+    "screenshots": [],
+    "brand_docs": []
+  },
+  "direction": {
+    "name": "收藏画册 · iOS系统色",
+    "mood": "成人向、克制、图片主导；UI采用系统色",
+    "principles": [
+      "插画是视觉中心",
+      "完整原图可随时查看；官方未完成姓名与故事文本在提交通过后揭晓",
+      "每个页面一个主要动作",
+      "成人语气",
+      "中断后恢复精确状态"
+    ],
+    "anti_principles": [
+      "幼儿化奖励",
+      "控件遮挡插画",
+      "持续闪烁",
+      "强计时",
+      "同屏多个强视觉特效"
+    ]
+  },
+  "tokens": {
+    "colors": {
+      "background": "systemGroupedBackground (#F2F2F7 / #000000)",
+      "surface": "secondarySystemGroupedBackground (#FFFFFF / #1C1C1E)",
+      "textPrimary": "label (#000000 / #FFFFFF)",
+      "textSecondary": "secondaryLabel (native dynamic color); web approximation #6E6E73 / #AEAEB2",
+      "accent": "systemBlue (#007AFF / #0A84FF)",
+      "onAccent": "#FFFFFF",
+      "border": "separator (native dynamic color); web approximation #C6C6C8 / #38383A",
+      "controlBorder": "systemGray (#8E8E93)",
+      "success": "systemGreen (#34C759 / #30D158); web text uses contrast-adjusted #248A3D / #30D158",
+      "error": "systemRed (#FF3B30 / #FF453A)"
+    },
+    "typography": {
+      "display": {
+        "size_pt": 28,
+        "weight": "semibold"
+      },
+      "title": {
+        "size_pt": 24,
+        "weight": "semibold"
+      },
+      "heading": {
+        "size_pt": 20,
+        "weight": "semibold"
+      },
+      "body": {
+        "size_pt": 17,
+        "weight": "regular"
+      },
+      "label": {
+        "size_pt": 17,
+        "weight": "semibold"
+      },
+      "secondary": {
+        "size_pt": 15
+      },
+      "caption": {
+        "size_pt": 13
+      },
+      "family": "iOS system; Dynamic Type semantic roles"
+    },
+    "spacing": {
+      "scale_pt": [
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        32
+      ],
+      "page_inset_pt": 20,
+      "small_phone_inset_pt": 16
+    },
+    "radius": {
+      "button_pt": 12,
+      "cover_pt": 16,
+      "sheet_pt": 24,
+      "board_pt": 12
+    },
+    "shadows": {
+      "default": "none",
+      "liftedPiece": "localized shadow during active drag",
+      "sheet": "native presentation"
+    },
+    "breakpoints": {
+      "smallPhone": "compact width <=375pt",
+      "phone": "compact width",
+      "tablet": "regular width; optional first-release support"
+    },
+    "motion": {
+      "feedback_ms": 100,
+      "enter_ms": 240,
+      "exit_ms": 180,
+      "seamFade_ms": 280,
+      "reduced": "no displacement; short fade or immediate change"
+    }
+  },
+  "components": {
+    "contract": "component-map.md",
+    "minimum_target_pt": 44,
+    "primary_button_height_pt": 52,
+    "root_tabs": [
+      "故事",
+      "我的故事集",
+      "收藏"
+    ],
+    "states": [
+      "default",
+      "selected",
+      "disabled",
+      "loading",
+      "empty",
+      "error",
+      "partial",
+      "complete"
+    ],
+    "preview": {
+      "entry_points": [
+        "关卡准备",
+        "拼图工具栏"
+      ],
+      "confirmation": false,
+      "limit": "none",
+      "penalty": false,
+      "image": "same scene asset",
+      "preserve": [
+        "piece slots and z order",
+        "tray order and scroll",
+        "board zoom and pan",
+        "screen scroll"
+      ]
+    },
+    "tray_order": "shuffle on new game; persist order and restore it unchanged",
+    "puzzle": {
+      "difficulties": [
+        12,
+        24,
+        48
+      ],
+      "grids": {
+        "12": [
+          4,
+          3
+        ],
+        "24": [
+          6,
+          4
+        ],
+        "48": [
+          8,
+          6
+        ]
+      },
+      "placement": "difficulty-based visible grid; neutral snapping to every cell; no answer checking during placement",
+      "validation": "exact slot identity only at submit; overall result only; failure preserves all slots",
+      "removed": [
+        "numbered answers",
+        "auto-place hint",
+        "correctness feedback during placement"
+      ],
+      "zoom": "fit or enlarged board; browse mode temporarily disables piece grabs so full board can pan even when occupied",
+      "occupied_cell": "board piece swaps with occupied piece; tray piece replaces occupied piece and returns old piece to tray",
+      "tray": "four columns, four visible rows; all remaining pieces rendered; vertical scroll and offset persistence",
+      "keyboard": "Enter places in middle cell; arrows move one cell; Delete returns piece to tray",
+      "save_migration": "prior free coordinates mapped to nearest containing cell; colliding pieces returned to tray; no correctness-based relocation"
+    },
+    "creator": {
+      "storage": "IndexedDB library, drafts and immutable image versions; localStorage progress",
+      "image_formats": [
+        "JPEG",
+        "PNG",
+        "WebP"
+      ],
+      "image_processing": "EXIF-aware decode; aspect-preserving 4:3 crop with x/y/zoom or full-image containment; preview same baked scene used by puzzle",
+      "cover": "choose any image in set",
+      "ordering": "drag row or explicit accessible up/down controls",
+      "quiz": "optional; three distinct options and one chosen correct answer",
+      "revision": "new image/crop creates new immutable version; metadata updates same version; current puzzle references original version",
+      "privacy": "local browser import, no remote upload",
+      "trial": "no achievements; restore previous game on exit or page reload; draft retains image settings",
+      "errors": [
+        "unsupported or invalid image",
+        "image too large",
+        "storage unavailable",
+        "storage quota exceeded",
+        "incomplete quiz",
+        "empty set/name",
+        "missing source"
+      ]
+    }
+  },
+  "layout": {
+    "grid": "4:3 scene;12=4×3,24=6×4,48=8×6; enlarged board for small pieces",
+    "page_width": "adaptive safe area; do not hard-code status bar or home indicator",
+    "section_rhythm": "12pt internal / 24pt between groups",
+    "density": "low; illustration has priority",
+    "responsive_rules": [
+      "large text expands rows",
+      "small phone collapses auxiliary tools before reducing puzzle touch targets",
+      "optional tablet uses board left and tray right",
+      "story pages scroll; puzzle stage remains touch-stable"
+    ]
+  },
+  "visual_language": {
+    "composition_rules": [
+      "one focal illustration per stage",
+      "controls outside illustration",
+      "collection grid allowed for peer artworks"
+    ],
+    "imagery_rules": [
+      "consistent adult hand-painted style",
+      "scene masters 3200×2400 or higher",
+      "keep crucial story clues within centered square safe crop",
+      "no rasterized names",
+      "runtime puzzle masks; do not generate individual fragments independently"
+    ],
+    "iconography_rules": [
+      "native SF Symbols single family",
+      "retain text labels"
+    ],
+    "data_visualization_rules": [
+      "simple progress only",
+      "no competitive dashboard in first release"
+    ],
+    "motion_rules": [
+      "finite state feedback",
+      "honor Reduce Motion"
+    ],
+    "anti_patterns": [
+      "art as control background without contrast plate",
+      "uncompleted story name exposes answer",
+      "particles behind puzzle",
+      "small phone targets under44pt"
+    ]
+  },
+  "accessibility": {
+    "contrast_policy": "minimum 4.5:1 normal text / 3:1 large text and functional outlines; final art requires separate QA",
+    "keyboard_policy": "Arrow keys move to adjacent cell; Enter places in middle cell; Delete returns to tray; no correct-target navigation. Native VoiceOver needs device checks.",
+    "focus_policy": "restore focus on sheet dismissal; move focus to new screen heading; no answer leak in alt labels",
+    "reduced_motion_policy": "replace movement with short fade; no particles"
+  },
+  "governance": {
+    "token_policy": "use semantic roles; update this contract before adding styles",
+    "component_policy": "shared component-map owns anatomy and states",
+    "when_to_add_new_tokens": "existing semantic token cannot express verified new requirement",
+    "when_to_add_new_components": "new workflow or reusable behavior needs a defined state and accessibility contract"
+  },
+  "open_questions": [
+    "final name",
+    "Bible translation",
+    "minimum iOS",
+    "monetization",
+    "first release scene count",
+    "iPad launch support",
+    "art style confirmation; built-in image generation tool unavailable in current session"
+  ],
+  "generation_status": {
+    "status": "user_supplied_assets_integrated",
+    "user_choice": "用户选择等内置生图工具可用后再生成；不使用API备用方式",
+    "generated_assets": 0,
+    "integrated_assets": 8,
+    "prompt_file": "素材生成提示集.md",
+    "supplied_assets": 8
+  },
+  "implementation": {
+    "architecture": "SwiftUI host + WKWebView shared game",
+    "offline_origin": "http://127.0.0.1:18765",
+    "mobile_entry": "web/index.html (default); ?prototype=1 for design inspection",
+    "native_import": "PHPicker and UIDocumentPicker; selected files only",
+    "signing": "unsigned device build in macOS GitHub Actions"
+  }
+}

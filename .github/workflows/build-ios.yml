@@ -1,0 +1,67 @@
+name: Build unsigned iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare project resources
+        run: |
+          python3 scripts/prepare-ios.py
+          python3 scripts/generate-project.py
+      - name: Build unsigned app
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -project ios/BibleStoryPuzzle.xcodeproj \
+            -scheme BibleStoryPuzzle -sdk iphoneos -configuration Release \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build >build-device.log 2>&1 || { tail -100 build-device.log; exit 1; }
+      - name: Package unsigned IPA
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/BibleStoryPuzzle.app Payload/
+          /usr/bin/zip -qry BibleStoryPuzzle-unsigned.ipa Payload
+          if codesign -dv Payload/BibleStoryPuzzle.app >codesign.txt 2>&1; then
+            echo "Unexpected signature in unsigned build"
+            exit 1
+          fi
+          file Payload/BibleStoryPuzzle.app/BibleStoryPuzzle
+          python3 scripts/verify-ipa.py BibleStoryPuzzle-unsigned.ipa
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: BibleStoryPuzzle-unsigned-ipa
+          path: |
+            BibleStoryPuzzle-unsigned.ipa
+            codesign.txt
+          if-no-files-found: error
+      - name: Select available iPhone simulator
+        run: python3 scripts/simulator-destination.py >> "$GITHUB_ENV"
+      - name: Test offline launch and native picker bridge
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -project ios/BibleStoryPuzzle.xcodeproj \
+            -scheme BibleStoryPuzzle -configuration Debug \
+            -destination "id=$PUZZLE_SIMULATOR" -derivedDataPath simulator-build \
+            -resultBundlePath ui-tests.xcresult test >build-simulator.log 2>&1 || { tail -120 build-simulator.log; exit 1; }
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-diagnostics
+          path: |
+            build-device.log
+            build-simulator.log
+            ui-tests.xcresult
+            codesign.txt

@@ -1,0 +1,345 @@
+// !$*UTF8*$!
+{
+	"archiveVersion" = 1;
+	"classes" = {
+	};
+	"objectVersion" = 56;
+	"objects" = {
+		"49F8EF83DE64C3D84F977078" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "App.swift";
+			"sourceTree" = "<group>";
+		};
+		"DAC35D1CC9761CCC80DA03D5" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "49F8EF83DE64C3D84F977078";
+		};
+		"99FC28806B368AAF7440492D" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "LocalAssetServer.swift";
+			"sourceTree" = "<group>";
+		};
+		"2E350A824AC814DEC797DDC9" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "99FC28806B368AAF7440492D";
+		};
+		"1D2735BC5D88328E6B426A35" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "PuzzleViewController.swift";
+			"sourceTree" = "<group>";
+		};
+		"B7DA1FAAB28A862BD77148F3" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "1D2735BC5D88328E6B426A35";
+		};
+		"D061BE1D5B0BFD1950F31BCD" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "folder.assetcatalog";
+			"path" = "Assets.xcassets";
+			"sourceTree" = "<group>";
+		};
+		"1B785D8A31C10DEB14C07328" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "D061BE1D5B0BFD1950F31BCD";
+		};
+		"9B2AA127B5D818E73DAA9023" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "folder";
+			"path" = "Web";
+			"sourceTree" = "<group>";
+		};
+		"B8D87A5F1948CB4212AAFD82" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9B2AA127B5D818E73DAA9023";
+		};
+		"5075ED2F96CBBAACFD22FBE2" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "audio.wav";
+			"path" = "place.wav";
+			"sourceTree" = "<group>";
+		};
+		"94F58B8BB9FD2D3FC15B2D0A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5075ED2F96CBBAACFD22FBE2";
+		};
+		"C4FA0C230EEF64BAA11DBE69" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "audio.wav";
+			"path" = "complete.wav";
+			"sourceTree" = "<group>";
+		};
+		"13381D55D543F3BD5BBFAF2F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C4FA0C230EEF64BAA11DBE69";
+		};
+		"7B594B6DB375E1BF3F23CDD6" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.plist.xml";
+			"path" = "Info.plist";
+			"sourceTree" = "<group>";
+		};
+		"26B2A637F7DC4079D5AB78A5" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.xml";
+			"path" = "PrivacyInfo.xcprivacy";
+			"sourceTree" = "<group>";
+		};
+		"E7A4DB31B7711884AA210878" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "26B2A637F7DC4079D5AB78A5";
+		};
+		"3C3B0F03DC089F93B8457928" = {
+			"isa" = "PBXGroup";
+			"children" = ("49F8EF83DE64C3D84F977078", "99FC28806B368AAF7440492D", "1D2735BC5D88328E6B426A35", "D061BE1D5B0BFD1950F31BCD", "9B2AA127B5D818E73DAA9023", "5075ED2F96CBBAACFD22FBE2", "C4FA0C230EEF64BAA11DBE69", "7B594B6DB375E1BF3F23CDD6", "26B2A637F7DC4079D5AB78A5");
+			"path" = "BibleStoryPuzzle";
+			"sourceTree" = "<group>";
+		};
+		"C8E410C79A41FEC4C7336287" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "LaunchTests.swift";
+			"sourceTree" = "<group>";
+		};
+		"E717C295FF9827DFF805D88B" = {
+			"isa" = "PBXGroup";
+			"children" = ("C8E410C79A41FEC4C7336287");
+			"path" = "BibleStoryPuzzleUITests";
+			"sourceTree" = "<group>";
+		};
+		"4E783A9E10D2A8ABA38CD11C" = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"includeInIndex" = 0;
+			"path" = "BibleStoryPuzzle.app";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		"6C7CCDEB3609F1FAA874E941" = {
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.cfbundle";
+			"includeInIndex" = 0;
+			"path" = "BibleStoryPuzzleUITests.xctest";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		"FBDC4F23F93125BBEEAE800C" = {
+			"isa" = "PBXGroup";
+			"children" = ("4E783A9E10D2A8ABA38CD11C", "6C7CCDEB3609F1FAA874E941");
+			"name" = "Products";
+			"sourceTree" = "<group>";
+		};
+		"870B3294C0CBD48AF6BBCC1B" = {
+			"isa" = "PBXGroup";
+			"children" = ("3C3B0F03DC089F93B8457928", "E717C295FF9827DFF805D88B", "FBDC4F23F93125BBEEAE800C");
+			"sourceTree" = "<group>";
+		};
+		"9E232BE73FECBBF8659C79E7" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"IPHONEOS_DEPLOYMENT_TARGET" = "16.0";
+				"SDKROOT" = "iphoneos";
+				"SWIFT_VERSION" = "5.0";
+				"CLANG_ENABLE_MODULES" = "YES";
+				"CLANG_ENABLE_OBJC_ARC" = "YES";
+				"ENABLE_USER_SCRIPT_SANDBOXING" = "YES";
+				"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+				"DEBUG_INFORMATION_FORMAT" = "dwarf";
+			};
+		};
+		"95126388EE2677EABF3CF99B" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"IPHONEOS_DEPLOYMENT_TARGET" = "16.0";
+				"SDKROOT" = "iphoneos";
+				"SWIFT_VERSION" = "5.0";
+				"CLANG_ENABLE_MODULES" = "YES";
+				"CLANG_ENABLE_OBJC_ARC" = "YES";
+				"ENABLE_USER_SCRIPT_SANDBOXING" = "YES";
+				"SWIFT_COMPILATION_MODE" = "wholemodule";
+			};
+		};
+		"E3F7F3E7782CC970D10BD52A" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = ("9E232BE73FECBBF8659C79E7", "95126388EE2677EABF3CF99B");
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"8B63A0393819EF9DE7F2B473" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.iszkq.biblestorypuzzle";
+				"INFOPLIST_FILE" = "BibleStoryPuzzle/Info.plist";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"TARGETED_DEVICE_FAMILY" = "1";
+				"ASSETCATALOG_COMPILER_APPICON_NAME" = "AppIcon";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"MARKETING_VERSION" = "0.5.0";
+				"CURRENT_PROJECT_VERSION" = "1";
+				"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+				"SUPPORTS_MACCATALYST" = "NO";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/Frameworks";
+			};
+		};
+		"281FF16EF2B60E76A20BAD7F" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.iszkq.biblestorypuzzle";
+				"INFOPLIST_FILE" = "BibleStoryPuzzle/Info.plist";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"TARGETED_DEVICE_FAMILY" = "1";
+				"ASSETCATALOG_COMPILER_APPICON_NAME" = "AppIcon";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"MARKETING_VERSION" = "0.5.0";
+				"CURRENT_PROJECT_VERSION" = "1";
+				"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+				"SUPPORTS_MACCATALYST" = "NO";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/Frameworks";
+			};
+		};
+		"6A5FF651C53622C64EF5D31B" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = ("8B63A0393819EF9DE7F2B473", "281FF16EF2B60E76A20BAD7F");
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"949D493B91791558E87BC5D7" = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = ("DAC35D1CC9761CCC80DA03D5", "2E350A824AC814DEC797DDC9", "B7DA1FAAB28A862BD77148F3");
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"BD92572B49AC16A86614498D" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = ();
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"8ECC8B5D05B79F879ACDF1A2" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = ("1B785D8A31C10DEB14C07328", "B8D87A5F1948CB4212AAFD82", "94F58B8BB9FD2D3FC15B2D0A", "13381D55D543F3BD5BBFAF2F", "E7A4DB31B7711884AA210878");
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"F75109BEB4DD8800DA6B45F8" = {
+			"isa" = "PBXNativeTarget";
+			"buildConfigurationList" = "6A5FF651C53622C64EF5D31B";
+			"buildPhases" = ("949D493B91791558E87BC5D7", "BD92572B49AC16A86614498D", "8ECC8B5D05B79F879ACDF1A2");
+			"buildRules" = ();
+			"dependencies" = ();
+			"name" = "BibleStoryPuzzle";
+			"productName" = "BibleStoryPuzzle";
+			"productReference" = "4E783A9E10D2A8ABA38CD11C";
+			"productType" = "com.apple.product-type.application";
+		};
+		"7E85D4A68785761E1DBB22D8" = {
+			"isa" = "PBXContainerItemProxy";
+			"containerPortal" = "98F54143AB4E86B28C3AFEE0";
+			"proxyType" = 1;
+			"remoteGlobalIDString" = "F75109BEB4DD8800DA6B45F8";
+			"remoteInfo" = "BibleStoryPuzzle";
+		};
+		"BAE932EF166B50AB877FDC6F" = {
+			"isa" = "PBXTargetDependency";
+			"target" = "F75109BEB4DD8800DA6B45F8";
+			"targetProxy" = "7E85D4A68785761E1DBB22D8";
+		};
+		"3325F69FD4DFE6E6674B1361" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Debug";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.iszkq.biblestorypuzzle.uitests";
+				"GENERATE_INFOPLIST_FILE" = "YES";
+				"TARGETED_DEVICE_FAMILY" = "1";
+				"TEST_TARGET_NAME" = "BibleStoryPuzzle";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+			};
+		};
+		"BB0D77B08ECB0D21E7974168" = {
+			"isa" = "XCBuildConfiguration";
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.iszkq.biblestorypuzzle.uitests";
+				"GENERATE_INFOPLIST_FILE" = "YES";
+				"TARGETED_DEVICE_FAMILY" = "1";
+				"TEST_TARGET_NAME" = "BibleStoryPuzzle";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"LD_RUNPATH_SEARCH_PATHS" = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+			};
+		};
+		"97C21DCA6FC10ED95694CFE0" = {
+			"isa" = "XCConfigurationList";
+			"buildConfigurations" = ("3325F69FD4DFE6E6674B1361", "BB0D77B08ECB0D21E7974168");
+			"defaultConfigurationIsVisible" = 0;
+			"defaultConfigurationName" = "Release";
+		};
+		"CD105291464DBD1C3C07E1CA" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C8E410C79A41FEC4C7336287";
+		};
+		"77A03FEE20FE96AD9384861E" = {
+			"isa" = "PBXSourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = ("CD105291464DBD1C3C07E1CA");
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"E05DB79C430AA1B0BA487AFC" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = ();
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"D5C76E148680C094C001AC35" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = 2147483647;
+			"files" = ();
+			"runOnlyForDeploymentPostprocessing" = 0;
+		};
+		"C062A5A4A7F4F37DD90F54CB" = {
+			"isa" = "PBXNativeTarget";
+			"buildConfigurationList" = "97C21DCA6FC10ED95694CFE0";
+			"buildPhases" = ("77A03FEE20FE96AD9384861E", "E05DB79C430AA1B0BA487AFC", "D5C76E148680C094C001AC35");
+			"buildRules" = ();
+			"dependencies" = ("BAE932EF166B50AB877FDC6F");
+			"name" = "BibleStoryPuzzleUITests";
+			"productName" = "BibleStoryPuzzleUITests";
+			"productReference" = "6C7CCDEB3609F1FAA874E941";
+			"productType" = "com.apple.product-type.bundle.ui-testing";
+		};
+		"98F54143AB4E86B28C3AFEE0" = {
+			"isa" = "PBXProject";
+			"attributes" = {
+				"LastUpgradeCheck" = "1600";
+				"TargetAttributes" = {
+					"F75109BEB4DD8800DA6B45F8" = {
+						"CreatedOnToolsVersion" = "16.0";
+					};
+					"C062A5A4A7F4F37DD90F54CB" = {
+						"CreatedOnToolsVersion" = "16.0";
+						"TestTargetID" = "F75109BEB4DD8800DA6B45F8";
+					};
+				};
+			};
+			"buildConfigurationList" = "E3F7F3E7782CC970D10BD52A";
+			"compatibilityVersion" = "Xcode 14.0";
+			"developmentRegion" = "zh-Hans";
+			"hasScannedForEncodings" = 0;
+			"knownRegions" = ("en", "zh-Hans", "Base");
+			"mainGroup" = "870B3294C0CBD48AF6BBCC1B";
+			"productRefGroup" = "FBDC4F23F93125BBEEAE800C";
+			"projectDirPath" = "";
+			"projectRoot" = "";
+			"targets" = ("F75109BEB4DD8800DA6B45F8", "C062A5A4A7F4F37DD90F54CB");
+		};
+	};
+	"rootObject" = "98F54143AB4E86B28C3AFEE0";
+}

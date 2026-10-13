@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+build/
+dist/
+test-results/
+playwright-report/
+ios/BibleStoryPuzzle/Web/
+ios/BibleStoryPuzzle.xcodeproj/xcuserdata/
+*.ipa
+*.xcarchive
+*.xcresult
+*.mobileprovision
+*.p12
+.env*

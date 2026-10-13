@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="assets/icon.png"><title>拼见圣经 · iOS页面流程稿</title>
+<style>
+:root{--bg:#f2f2f7;--surface:#ffffff;--text:#000000;--muted:#6e6e73;--accent:#007aff;--border:#c6c6c8;--control:#8e8e93;--error:#ff3b30}
+*{box-sizing:border-box}body{margin:0;background:#e5e5ea;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.6}button,a{font:inherit}button{cursor:pointer;color:inherit}button:disabled{cursor:default;opacity:.48}button:focus-visible,a:focus-visible{outline:3px solid #007aff;outline-offset:4px}a{color:var(--accent)}
+.workspace{max-width:1250px;margin:auto;padding:36px 28px;display:grid;grid-template-columns:230px minmax(320px,440px) minmax(220px,1fr);gap:36px;align-items:start}h1,h2,h3,p{margin-top:0}h1{font-size:26px;line-height:1.3;margin-bottom:12px}h2{font-size:24px;line-height:1.4;margin-bottom:10px}h3{font-size:19px;line-height:1.5;margin-bottom:8px}.muted{color:var(--muted)}.small{font-size:13px}.eyebrow{font-size:13px;color:var(--muted);margin-bottom:12px}.intro{font-size:14px;color:var(--muted)}.pages{display:flex;flex-direction:column;gap:4px;margin-top:24px}.page-link{border:0;background:transparent;text-align:left;padding:10px 12px;min-height:44px;border-radius:8px}.page-link[aria-current=page]{background:#dcecff;font-weight:600}.docs{margin-top:28px;display:grid;gap:10px;font-size:14px}.reset{margin-top:20px;border:1px solid var(--control);border-radius:8px;padding:8px 12px;min-height:44px;background:transparent}
+.device{position:relative;background:var(--bg);border:1px solid #c6c6c8;border-radius:30px;overflow:hidden;box-shadow:0 20px 44px #00000013;width:100%;max-width:393px;margin:0 auto}.status{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:12px;font-weight:600}.viewport{height:744px;overflow-y:auto;scrollbar-width:thin;display:flex;flex-direction:column}.screen{padding:0 20px 24px;flex:1}.bar{display:flex;justify-content:space-between;align-items:center;min-height:48px;margin-bottom:16px;gap:8px}.bar strong{font-size:16px}.icon-button{border:0;background:transparent;min-width:44px;min-height:44px;padding:7px;font-size:14px}.tabbar{display:flex;position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);padding:8px 0 20px;gap:16px;justify-content:center}.tabbar button{border:0;background:none;min-height:44px;width:44%;font-size:14px;color:var(--muted)}.tabbar button.active{color:var(--accent);font-weight:650}.home-indicator{height:18px;background:var(--bg);display:flex;justify-content:center;align-items:center}.home-indicator:after{content:"";width:100px;height:4px;background:#000000;border-radius:2px}
+.primary,.secondary{display:block;width:100%;min-height:52px;padding:12px 16px;border-radius:12px;font-size:17px;font-weight:600;margin-top:12px}.primary{background:var(--accent);color:white;border:1px solid var(--accent)}.secondary{border:1px solid var(--control);background:transparent}.text-button{background:transparent;border:0;color:var(--accent);min-height:44px;padding:8px 0}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.block{margin-top:24px}.rule{border-top:1px solid var(--border);padding-top:20px}.art{aspect-ratio:4/3;border-radius:16px;border:1px dashed #8e8e93;background:#e5e5ea;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center;color:#6e6e73;margin:12px 0 16px}.art .frame-mark{font-size:30px;line-height:1;font-weight:300;color:#8e8e93}.art b{font-size:16px}.art span{font-size:12px;max-width:235px}.art.small-art{margin:0;min-width:84px;width:84px;padding:8px;border-radius:10px;font-size:12px}.art.small-art b{font-size:12px}.art.small-art span,.art.small-art .frame-mark{display:none}.art.hero{aspect-ratio:3/4}.art.compact{margin:4px 0 16px}
+.chapter{padding:18px 0;border-top:1px solid var(--border);width:100%;background:transparent;border-right:0;border-left:0;border-bottom:0;text-align:left;display:flex;align-items:center;justify-content:space-between;min-height:64px}.story-row{display:flex;align-items:center;gap:14px;border:0;border-bottom:1px solid var(--border);background:transparent;width:100%;padding:16px 0;text-align:left;min-height:104px}.story-row p{margin:2px 0 0}.story-row .copy{flex:1}.tag{font-size:13px;color:var(--muted)}.difficulty{display:grid;grid-template-columns:1fr 1fr;gap:10px}.difficulty button{background:var(--surface);border:1px solid var(--control);padding:12px 8px;border-radius:12px;min-height:66px}.difficulty button.selected{border:2px solid var(--accent);background:#e5f1ff}.difficulty small{display:block}.progress{height:3px;background:#e5e5ea;margin:12px 0 20px;border-radius:3px}.progress i{display:block;height:3px;background:var(--accent)}
+.board{display:grid;grid-template-columns:repeat(4,1fr);aspect-ratio:4/3;gap:3px;background:#e5e5ea;padding:6px;border-radius:12px;margin-bottom:20px}.board.d24{grid-template-columns:repeat(6,1fr)}.slot{border:1px dashed #8e8e93;min-width:0;min-height:44px;background:#f2f2f7;border-radius:3px;font-size:13px;position:relative}.slot.filled{background:#e5f1ff;border:1px solid #007aff;color:#005bbb}.slot.active{outline:2px solid var(--accent);outline-offset:-3px}.tray{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.piece{height:54px;min-width:44px;min-height:44px;border:1px solid var(--control);background:var(--surface);border-radius:6px;font-size:13px}.piece.selected{background:#e5f1ff;border:2px solid var(--accent)}.tools{display:flex;gap:12px;justify-content:space-between;margin-top:16px}.tools button{flex:1;border:0;background:transparent;color:var(--accent);min-height:44px;padding:8px}.prototype-hint{padding:10px 12px;background:#e5e5ea;color:#6e6e73;border-radius:8px;font-size:12px;margin:12px 0}.option{width:100%;display:flex;justify-content:space-between;align-items:center;min-height:52px;padding:12px 16px;margin:10px 0;border:1px solid var(--control);border-radius:12px;background:var(--surface);font-size:17px}.option.selected{border:2px solid var(--accent);background:#e5f1ff}.option.wrong{border-color:var(--error)}.message{font-size:14px;min-height:24px;margin-top:12px}.error{color:var(--error)}.success{color:#248a3d}.reader{font-size:17px;line-height:1.75}.reference{padding:12px 0;border-top:1px solid var(--border);font-size:14px;color:var(--muted)}.segmented{display:flex;gap:4px;background:#e5e5ea;border-radius:10px;padding:4px;margin:16px 0}.segmented button{border:0;min-height:40px;flex:1;border-radius:7px;background:none}.segmented button.active{background:var(--surface);font-weight:600}.collection{display:grid;grid-template-columns:1fr 1fr;gap:20px 12px}.collection button{padding:0;border:0;background:transparent;text-align:left}.collection .art{margin:0 0 8px;padding:8px;border-radius:12px}.collection .art b{font-size:13px}.collection .art span{display:none}.collection p{font-size:13px;margin:4px 0}.empty{text-align:center;padding:44px 0}.setting{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px;border-bottom:1px solid var(--border);width:100%;background:transparent;border-top:0;border-left:0;border-right:0;text-align:left}.setting small{display:block;color:var(--muted);font-size:13px}.setting input{width:22px;height:22px;accent-color:var(--accent)}.danger{color:var(--error)}
+.viewport{overflow:hidden}.screen{overflow-y:auto;min-height:0}#tabs{flex-shrink:0}.tabbar{position:static}
+.notes{padding-top:6px}.note-section{padding-top:20px;border-top:1px solid #c6c6c8;margin-top:20px;font-size:14px}.note-section h3{font-size:16px}.notes ol,.notes ul{padding-left:20px}.notes li{margin-bottom:8px}.label{font-size:12px;letter-spacing:.02em;color:var(--muted)}.notes .intro{font-size:14px}.modal-shade{position:absolute;inset:0;background:#00000055;z-index:5;display:flex;align-items:flex-end}.sheet{width:100%;background:var(--surface);padding:24px 20px 28px;border-radius:24px 24px 0 0;max-height:88%;overflow:auto}.sheet .art{max-height:270px}.sheet h3{margin-bottom:12px}.toast{position:absolute;left:20px;right:20px;bottom:30px;background:#000000;color:white;padding:12px 16px;border-radius:10px;font-size:14px;z-index:6;text-align:center}.explain{border-top:1px solid var(--border);margin-top:24px;padding-top:16px;font-size:13px;color:var(--muted)}
+@media(max-width:1040px){.workspace{grid-template-columns:200px minmax(320px,1fr);gap:24px}.notes{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:20px}.notes>h2,.notes>.intro{grid-column:1/-1}.note-section{margin-top:0}}
+@media(max-width:650px){.workspace{display:block;padding:20px 12px}.pages{flex-direction:row;flex-wrap:wrap;gap:4px;margin:16px 0}.page-link{font-size:12px;padding:8px}.sidebar h1{font-size:24px}.docs{margin:12px 0;display:flex;flex-wrap:wrap}.reset{margin:0 0 18px}.device{border-radius:20px}.notes{display:block;margin-top:24px}.viewport{height:720px}.screen{padding-left:16px;padding-right:16px}.note-section{margin-top:20px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+
+@media(prefers-color-scheme:dark){
+ :root{color-scheme:dark;--bg:#000;--surface:#1c1c1e;--text:#fff;--muted:#aeaeb2;--accent:#0a84ff;--border:#38383a;--control:#8e8e93;--error:#ff453a}
+ body{background:#1c1c1e}.device{border-color:#48484a;box-shadow:none}.page-link[aria-current=page]{background:#102c4e}.art{background:#2c2c2e;color:var(--muted);border-color:var(--control)}.difficulty button.selected,.piece.selected,.option.selected{background:#102c4e}.progress,.board,.segmented,.prototype-hint{background:#2c2c2e}.slot{background:#1c1c1e}.slot.filled{background:#102c4e;color:#b8dcff}.prototype-hint{color:#aeaeb2}.note-section{border-color:#38383a}.success{color:#30d158}.home-indicator:after{background:#fff}
+}
+
+/* Shared puzzle metrics; image geometry uses normalized scene coordinates. */
+:root{--tray-piece-height:64px;--tray-gap:6px;--expanded-board-width:640px;--drag-shadow:0 5px 12px #0004}
+.art{padding:0;border:0;overflow:hidden;background:var(--surface);display:block}.art img{display:block;width:100%;height:100%;object-fit:cover}.art.hero{aspect-ratio:4/3}.difficulty{grid-template-columns:repeat(3,minmax(0,1fr))}.difficulty button{font-size:14px;padding:10px 2px}.difficulty small{font-size:11px}
+.app-mark{width:28px;height:28px;border-radius:7px;vertical-align:middle;margin-right:8px}.puzzle-content .bar{margin-bottom:4px}.puzzle-content .progress{margin:6px 0}.play-tools{display:flex;justify-content:space-between;gap:12px}.play-tools button{margin:0}.board-window{overflow:auto;max-width:100%;border:1px solid var(--border);border-radius:8px;background:var(--surface);overscroll-behavior:contain}.board-window.enlarged{height:265px;scrollbar-width:thin}.free-board{position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;isolation:isolate;touch-action:pan-x pan-y}.free-board.zoomed{width:var(--expanded-board-width);max-width:none}.fragment{padding:0;border:0;border-radius:0;background:transparent;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;min-width:44px;min-height:44px;line-height:0}.fragment svg,.drag-ghost svg{width:100%;height:100%;display:block;pointer-events:none}.on-board{position:absolute;transform:translate(-50%,-50%)}.fragment.dragging{opacity:.2}.fragment:focus-visible{outline:2px solid var(--accent);outline-offset:-4px}.fragment-tray{min-height:calc(var(--tray-piece-height)*2 + var(--tray-gap));display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,var(--tray-piece-height));gap:var(--tray-gap);align-items:center;justify-items:center;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:2px}.in-tray{height:var(--tray-piece-height);width:calc(var(--tray-piece-height)*var(--piece-ratio));max-width:100%}.tray-label{min-height:32px;font-size:13px;gap:4px}.tray-label span{font-size:11px}.tray-empty{grid-column:1/-1;grid-row:1/3;line-height:1.6;text-align:center;padding:16px}.pager{display:flex;align-items:center;justify-content:space-between;height:44px}.pager button{font-size:13px}.puzzle-content .primary{margin-top:4px}.game-help{margin:4px 0 0;font-size:12px;text-align:center}.drag-ghost{position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:1000;filter:drop-shadow(var(--drag-shadow))}.preview-window{overflow:auto;max-height:430px;border-radius:12px}.preview-window .art{margin:0;max-height:none}.preview-window.large .art{width:760px;max-width:none}.preview-window img{pointer-events:none}.sheet .preview-tools{display:flex;justify-content:space-between;align-items:center}.asset-failed{display:grid;place-content:center;line-height:1.6;color:var(--muted);padding:20px}.asset-failed img{display:none}
+
+
+/* Personal collections share system colors, page spacing and controls. */
+:root{--field-height:48px;--editor-thumb:72px;--tray-piece-height:60px;--tray-visible-height:270px}
+.field{display:block;margin:20px 0 0;font-weight:600;overflow-wrap:anywhere}.field input,.field textarea,.field select{display:block;box-sizing:border-box;width:100%;min-height:var(--field-height);margin-top:6px;padding:12px;border:1px solid var(--control);border-radius:10px;background:var(--surface);color:var(--text);font:inherit;font-weight:400}.field textarea{min-height:100px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:2px}.file-button{display:inline-flex;align-items:center;justify-content:center;position:relative;min-height:44px;padding:8px 12px;border:1px solid var(--control);border-radius:10px;color:var(--accent);cursor:pointer;overflow:hidden;background:var(--surface);font-size:14px}.file-button input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.file-button:focus-within{outline:2px solid var(--accent);outline-offset:2px}.file-button.disabled{opacity:.5;pointer-events:none}.replace-image{margin:16px 0 0}.set-row{display:flex;align-items:center;width:100%;gap:14px;text-align:left;min-height:112px;padding:16px 0;border:0;border-bottom:1px solid var(--border);background:transparent}.set-row .art{width:100px;min-width:100px;margin:0;border-radius:10px}.set-copy{display:grid;gap:4px;min-width:0;flex:1;overflow-wrap:anywhere}.content-text{white-space:pre-wrap;overflow-wrap:anywhere}.draft-banner{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:16px 0}.draft-banner p{margin:4px 0}.edit-row{display:flex;gap:12px;align-items:center;border-bottom:1px solid var(--border);padding:12px 0}.edit-image{padding:0;border:0;border-radius:8px;overflow:hidden;width:var(--editor-thumb);min-width:var(--editor-thumb);height:64px;background:var(--surface)}.edit-image img{width:100%;height:100%;object-fit:contain}.edit-copy{min-width:0;flex:1;display:grid;gap:3px}.row-title,.cover-button{padding:0;min-height:44px;border:0;background:transparent;text-align:left;overflow-wrap:anywhere}.row-title{font-weight:600}.cover-button{font-size:13px;color:var(--accent)}.order-buttons{display:grid;flex-shrink:0}.order-buttons button{font-size:12px;padding:4px;min-width:44px}.form-message{white-space:pre-wrap;margin:12px 0;font-size:14px;overflow-wrap:anywhere}.form-message:empty{display:none}.range-field{display:grid;grid-template-columns:1fr auto;gap:4px;margin:16px 0;font-size:14px}.range-field input{grid-column:1/-1;width:100%;min-height:44px;margin:0;accent-color:var(--accent)}.fit-picker{margin:20px 0 0;border:0;padding:0}.fit-picker legend{font-weight:600;margin-bottom:8px}.fit-picker label{display:inline-flex;align-items:center;min-height:44px;gap:4px;margin-right:10px;font-size:14px}.fit-picker input{accent-color:var(--accent);width:20px;height:20px}.bar-spacer{width:44px}.compact-empty{padding:24px 0}#crop-preview{width:100%;aspect-ratio:4/3;border-radius:12px;display:block;background:var(--surface)}.import-progress{font-size:14px;color:var(--accent)}.tabbar{gap:0}.tabbar button{width:33.333%;font-size:13px;padding:4px}.screen h2,.screen strong{overflow-wrap:anywhere}
+/* All cells snap equally; the grid contains no answer information. */
+.board-grid{position:absolute;inset:0;display:grid;pointer-events:none;z-index:0}.board-cell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);opacity:.7}.fragment-tray{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:var(--tray-piece-height);grid-template-rows:none;max-height:var(--tray-visible-height);min-height:var(--tray-piece-height);overflow-y:auto;overscroll-behavior:contain;align-content:start;scrollbar-width:thin;padding:4px;gap:var(--tray-gap);touch-action:pan-y}.fragment-tray .in-tray{max-width:100%;width:calc(var(--tray-piece-height)*var(--piece-ratio));height:var(--tray-piece-height)}.tray-empty{grid-column:1/-1;grid-row:auto;min-height:var(--tray-piece-height)}.puzzle-content .primary{margin-top:12px}.tray-summary{font-size:12px;color:var(--muted);margin:4px 0}.free-board.zoomed{min-width:var(--expanded-board-width)}.art img{object-fit:contain}.story-row .copy .tag{display:block}.game-help{padding-bottom:4px}.fragment.on-board{min-width:0;min-height:0}
+
+.pan-mode .on-board{pointer-events:none}.play-tools{gap:6px}.play-tools button{font-size:13px}
+:root{--tray-piece-height:52px;--tray-visible-height:234px}.submit-dock{position:sticky;bottom:0;z-index:2;background:var(--bg);padding:4px 0}.submit-dock .primary{margin-top:0}
+:root{--tray-piece-height:48px;--tray-visible-height:218px}.puzzle-screen{padding-bottom:0}
+</style>
+<script>document.documentElement.classList.add(new URLSearchParams(location.search).has("prototype")?"prototype":"app");</script>
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+<main class="workspace">
+<aside class="sidebar">
+<p class="eyebrow">成人向 iOS 拼图 · 系统色 v0.4</p>
+<h1>拼见圣经</h1>
+<p class="intro">先拼出画面，再认识人物。拖动碎片到格子，自行对照原图；提交后才检查整体。已接入你提供的八张图片。</p>
+<nav class="pages" aria-label="设计页面"></nav>
+<div class="docs"><a href="设计流程与iOS页面规划.md">完整页面规划 ↗</a><a href="素材需求与精美制作流程.md">素材需求与制作流程 ↗</a></div>
+<button class="reset" data-action="reset">重置演示进度</button>
+<p class="small muted">侧栏可直接查看各页面，不代表游戏中所有关卡已经解锁。演示进度尝试保存于当前浏览器。</p>
+</aside>
+<section class="device" aria-label="iPhone页面流程演示">
+<div class="status" aria-hidden="true"><span>9:41</span><span>iOS 结构稿</span></div>
+<div class="viewport" id="viewport"><div class="screen" id="screen"></div><div id="tabs"></div></div>
+<div class="home-indicator" aria-hidden="true"></div><div id="overlay"></div>
+</section>
+<aside class="notes" id="notes" aria-label="当前页面设计说明"></aside>
+</main>
+<script>
+'use strict';
+const pages=[['welcome','P00 欢迎'],['home','P01 故事首页'],['list','P02 选关'],['prepare','P03 准备'],['puzzle','P04 拼图'],['guess','P05 认人物'],['reveal','P06 揭晓'],['collection','P07 收藏'],['detail','P08 详情'],['settings','P09 设置']];
+const stories=[
+ {id:1,person:'摩西',title:'海中的道路',ref:'出埃及记14:15–31',clue:'再观察一下他手中的手杖和两侧的海水。',question:'画面中拿着手杖、带领人群的人是谁？',options:['约书亚','摩西','亚伦'],summary:'以色列人来到海边，前方是海水，后方有追兵。摩西按照上帝的吩咐向海伸杖，海水分开，百姓走在干地上经过。他们在艰难处境中经历了出路。画面以手杖、两侧海水和行进的人群作为识别线索。'},
+ {id:2,person:'挪亚',title:'归来的鸽子',ref:'创世记8:6–12',clue:'留意方舟和归来的鸽子。',question:'方舟旁接回鸽子的人是谁？',options:['亚伯拉罕','挪亚','雅各'],summary:'洪水之后，挪亚从方舟里放出鸽子，观察地面的变化。鸽子后来带回新拧下来的橄榄叶，成为画面中的重要线索。'},
+ {id:3,person:'大卫',title:'少年与巨人',ref:'撒母耳记上17章',clue:'留意少年手中的投石索。',question:'手持投石索的少年是谁？',options:['大卫','扫罗','撒母耳'],summary:'大卫面对体型高大的歌利亚，没有使用王的盔甲，而是带着牧人的器具迎上前去。少年与巨人的体型差和投石索，是这个故事的画面线索。'},
+ {id:4,person:'路得',title:'麦田里的拾穗者',ref:'路得记2章',clue:'观察她在田间拾取麦穗的动作。',question:'在这段故事中，田间拾穗的人是谁？',options:['以斯帖','路得','米利暗'],summary:'路得来到田间，跟在收割的人后面拾取麦穗。她在波阿斯的田里得到帮助。画面以麦田与拾穗动作呈现这个故事。'},
+ {id:5,person:'但以理',title:'狮子之间',ref:'但以理书6章',clue:'观察人物周围的狮子和洞穴。',question:'狮子之间的主要人物是谁？',options:['约拿','以利亚','但以理'],summary:'但以理因坚持祷告被投入狮子坑。他在其中得到保守，后来从坑中被带出来。画面以洞穴、狮子和人物平静的姿态作为线索。'},
+ {id:6,person:'以斯帖',title:'王宫中的请求',ref:'以斯帖记5:1–3',clue:'观察王后、王宫和伸出的金杖。',question:'来到王面前提出请求的王后是谁？',options:['路得','以斯帖','底波拉'],summary:'以斯帖穿上朝服，来到王宫内院。王看见她，向她伸出金杖，她便上前触摸杖头。画面以王宫、王后和金杖呈现这段情节。'}
+];
+const spec={
+welcome:{name:'欢迎与教学',goal:'一句话说明玩法，直接进入样板关。',layout:['中性封面，不展示待猜人物','主按钮进入第一关；次按钮浏览故事','教学在首次放片时出现，不做长轮播'],assets:'B01 中性欢迎插画；字标由页面排版。',states:'首次、跳过教学、封面加载失败。'},
+home:{name:'故事首页',goal:'打开后能继续上次，或开始下一个故事。',layout:['一个主要封面与一个主要动作','进行中显示已摆片数；封面展示完整图片','底部为故事、我的故事集、收藏三个Tab'],assets:'A02完整故事图与同图缩略封面。',states:'首次、进行中、等待回答、上次结果、全部完成。'},
+list:{name:'章节与关卡',goal:'用清楚的状态区分可玩、进行中、完成与锁定。',layout:['首版一个故事选集，不放空章节','官方未完成显示编号，封面可查看完整图片','完成拼图解锁下一关，答错不阻断'],assets:'A03完整缩略封面；统一状态图标。',states:'可开始、继续、已发现、未解锁。'},
+prepare:{name:'关卡准备',goal:'确认数量和是否继续当前局。',layout:['12块/24块/48块显式选择；初次默认12','可直接预览完整图片；人物姓名、题目与经文留到揭晓','重开、改难度明确提示当前局会重置'],assets:'同一完整故事原图；难度按钮由UI绘制。',states:'新局、已有存档、改变难度、完成后重玩。'},
+puzzle:{name:'拼图核心页',goal:'棋盘、托盘与工具同时可操作，图片不被按钮盖住。',layout:['4:3网格画框；12/24/48块按难度划格，同图互补凹凸切片','拖到任意格自动贴合；不判断该格对错，已占格交换或换回托盘','原图不限次；提交时才校验整体，失败保持布局；通过后认人物'],assets:'A02 同一场景纹理＋程序互补mask；中性拿放反馈（原型不播放音效）。',states:'未摆放、部分、网格拖动、未摆全提交、提交错误、通过、恢复。'},
+guess:{name:'认人物',goal:'拼完才出现人物候选；不熟悉内容也能继续。',layout:['整图→题目→三个选项→确认答案','选择后再确认，避免误触立即判错','可再试，也可直接查看故事'],assets:'复用A02，文字与选项为独立配置。',states:'未选择、已选择、错误、正确、直接揭晓。'},
+reveal:{name:'故事揭晓',goal:'把刚拼出的画与人物故事联系起来。',layout:['正式人物名、故事标题和整图','概述与经文出处，不混用经文译本','已发现与主动收藏分别记录'],assets:'复用A02；经核对的故事概述与出处。',states:'已发现、未收藏、已收藏、最后一关。'},
+collection:{name:'收藏画册',goal:'图片主导的回看入口，收藏与全部故事可切换。',layout:['成人画册式双列网格；大字/小屏可单列','未发现不展示名字或人物头像','空收藏给真实下一步，不伪造内容'],assets:'A03 已发现封面；中性未发现占位。',states:'空收藏、有收藏、全部故事、未发现。'},
+detail:{name:'已发现故事详情',goal:'看完整插画与故事，随时重玩或改变收藏。',layout:['可打开大图，保持阅读滚动位置','重玩保留首次完成和收藏记录','经文正文等译本确定后加入'],assets:'A02/A03与独立故事文本。',states:'已收藏、未收藏、大图查看、重玩。'},
+settings:{name:'设置',goal:'只有实际生效的偏好与清楚的存档说明。',layout:['音效与触感独立开关','文字和减少动态效果尊重系统','清除进度是独立危险操作，有确认'],assets:'SF Symbols与原生开关，无需背景插画。',states:'偏好开关、内容说明、本地存档、清除确认。'}
+};
+const KEY='biblePuzzleDesignV1';
+const initial=()=>({completed:[],collected:[],current:null,settings:{sound:true,haptic:true}});
+let state=initial(),screen='welcome',storyID=1,count=12,selectedPiece=null,chosen=null,result='',filter='saved',sheet=null,pendingStory=null,dialogReturn=null;
+try{const saved=JSON.parse(localStorage.getItem(KEY));if(saved&&Array.isArray(saved.completed)&&Array.isArray(saved.collected)&&saved.settings){state=saved;screen='home';storyID=saved.current?.storyID||1;count=saved.current?.count||12;}}catch(e){}
+if(state.current&&!state.current.positions){state.current.positions={};state.current.placed=[];state.current.layer=0;state.current.trayPage=0;state.current.zoom=false;state.current.panX=0;state.current.panY=0;if(state.current.phase==='puzzle')state.current.submitResult='';}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+const story=()=>stories.find(s=>s.id===storyID)||stories[0];
+const number=id=>isCustom(id)?'我的拼图':'故事'+String(id).padStart(2,'0');
+const title=s=>s.custom?s.title:state.completed.includes(s.id)?s.person+' · '+s.title:number(s.id);
+const button=(label,action,kind='primary',extra='')=>`<button class="${kind}" data-action="${action}" ${extra}>${label}</button>`;
+function art(mode='unknown',compact=false,id=storyID){const s=stories.find(v=>v.id===id);if(s?.custom)return personalArt(s.image,'完整故事画面');const name=mode==='neutral'?'welcome':sceneNames[id-1],file=name;return `<div class="art ${compact?'compact':''}"><img src="assets/${file}.jpg" alt="${mode==='neutral'?'书页与拼片的欢迎插画':'完整故事画面'}" draggable="false"></div>`;}
+function bar(label,back='home',right=''){return `<header class="bar">${button('返回',`go:${back}`,'icon-button')}<strong>${label}</strong>${right||'<span style="width:44px" aria-hidden="true"></span>'}</header>`;}
+function current(){return state.current?.storyID===storyID?state.current:null;}
+function shuffledPieces(n){const ids=Array.from({length:n},(_,i)=>i);for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}return ids;}
+function makeCurrent(){state.current={storyID,count,placed:[],trayOrder:shuffledPieces(count),positions:{},layer:0,trayPage:0,zoom:false,panX:0,panY:0,trayScroll:0,submitResult:'',submitAttempts:0,phase:'puzzle',chosen:null,result:'',preview:false};selectedPiece=null;chosen=null;result='';persist();}
+function ensure(){if(!current())makeCurrent();count=state.current.count;if(!state.current.positions){state.current.positions={};state.current.placed=[];state.current.layer=0;state.current.trayPage=0;state.current.zoom=false;state.current.phase='puzzle';state.current.submitResult='';persist();}if(!state.current.trayOrder){state.current.trayOrder=shuffledPieces(count);persist();}chosen=state.current.chosen;result=state.current.result||'';}
+function finish(){if(!creator.trial&&!state.completed.includes(storyID))state.completed.push(storyID);if(current())state.current.phase='guess';persist();}
+function storyRows(){return stories.filter(s=>!s.custom).map(s=>{const completed=state.completed.includes(s.id),locked=s.id>1&&!state.completed.includes(s.id-1),running=state.current?.storyID===s.id&&!completed;return `<button class="story-row" data-action="choose:${s.id}" ${locked?'aria-disabled="true"':''}><div class="art small-art"><img src="assets/${sceneNames[s.id-1]}-thumb.jpg" alt="故事封面" draggable="false"></div><div class="copy"><strong>${title(s)}</strong><p class="tag">${completed?'已发现 · 查看故事':locked?'完成前一个故事后开启':running?'继续 · '+state.current.placed.length+'/'+state.current.count:'可拼 · 12/24/48块'}</p></div><span aria-hidden="true">${locked?'锁定':'›'}</span></button>`;}).join('');}
+function render(){const s=story(),c=current();let html='';document.getElementById('overlay').innerHTML='';
+if(screen==='welcome')html=`<div style="padding-top:30px"><p class="eyebrow">拼见圣经</p>${art('neutral')}<h2>拼出画面，<br>发现故事。</h2><p class="muted">把碎片放回画框，认一认画面中的人物，把喜欢的故事收进画册。</p>${button('开始第一个故事','first')}${button('浏览故事','go:home','text-button')}<p class="explain">无需登录。可随时查看原图，摆放完成后主动提交。</p></div>`;
+if(screen==='home'){const session=state.current;const all=state.completed.filter(id=>id<=6).length===6;const next=stories.find(x=>!x.custom&&!state.completed.includes(x.id))||stories[0];const shown=session?(stories.find(x=>x.id===session.storyID)||stories[0]):next;const label=session?(session.phase==='puzzle'?'继续拼图':session.phase==='guess'?(shown.custom?'继续答题':'继续认人物'):'查看上次故事'):(all?'重温已发现的故事':'开始下一个故事');html=`<div class="bar"><strong><img class="app-mark" src="assets/icon.png" alt="">拼见圣经</strong>${button('设置','go:settings','icon-button')}</div><h2>今天，拼一个故事。</h2>${art(state.completed.includes(shown.id)?'full':'unknown',false,shown.id)}<div class="row"><strong>${title(shown)}</strong><span class="tag">${session?session.placed.length+'/'+session.count+'块':'12块起'}</span></div><p class="muted small">${session?'进度已保存，随时继续。':'从画面中的线索，认识一个人物。'}</p>${button(label,'resume')}<div class="block"><div class="row"><h3>故事篇章</h3>${button('查看全部','go:list','text-button')}</div><button class="chapter" data-action="go:list"><span>第一辑 · 发现与旅程<br><small class="muted">已完成${state.completed.filter(id=>id<=6).length}/6个故事</small></span><span aria-hidden="true">›</span></button></div>${state.collected.length?`<div class="block"><h3>最近收藏</h3><p class="muted small">${state.collected.slice(-2).map(id=>(stories.find(x=>x.id===id)?.person||'我的图片')).join(' · ')}</p>${button('打开收藏册','go:collection','text-button')}</div>`:''}`;}
+if(screen==='list')html=`${bar('故事篇章')}<h2>发现与旅程</h2><p class="muted">六个画面，六个故事。拼完一幅，开启下一幅。</p><p class="small muted">已完成${state.completed.filter(id=>id<=6).length}/6 · 答错也可以查看故事</p>${storyRows()}`;
+if(screen==='prepare')html=`${bar(number(storyID),'list')}<h2>${title(s)}</h2>${art(state.completed.includes(storyID)?'full':'unknown')}<p class="muted">${state.completed.includes(storyID)?'重温这幅画。已发现与收藏记录会保留。':'拼完画面后，猜一猜其中的人物。'}</p><h3>拼片数量</h3><div class="difficulty">${[12,24,48].map(n=>`<button class="${count===n?'selected':''}" aria-pressed="${count===n}" data-action="difficulty:${n}">${n===12?'轻松':n===24?'标准':'困难'} · ${n}块<small>${n===12?'4列 × 3行':n===24?'6列 × 4行':'8列 × 6行'}</small></button>`).join('')}</div><p class="small muted block">随时暂停，自动保存。对照原图自由摆放，提交后才判断。</p>${button('查看完整图片','sheet:preview','secondary')}${button(c?'继续拼图':'开始拼图','start')}${c?button('重新开始','restart','text-button'):''}`;
+if(screen==='puzzle'){ensure();html=puzzleHTML();}
+if(screen==='guess'){ensure();html=`${bar(s.custom?'回答问题':'发现人物','home')}${art('full',true)}<h3>${s.question}</h3>${s.options.map(o=>`<button class="option ${chosen===o?'selected':''} ${result==='wrong'&&chosen===o?'wrong':''}" data-action="answer:${s.custom?encodeURIComponent(o):o}" aria-pressed="${chosen===o}"><span>${o}</span><span class="small">${chosen===o?'已选':''}</span></button>`).join('')}<div class="message ${result==='wrong'?'error':'success'}" role="status">${result==='wrong'?s.clue:result==='correct'?s.custom?'✓ 回答正确。':'✓ 是'+s.person+'。':''}</div>${result==='correct'?button('查看故事','toReveal'):button('确认答案','confirm','primary',chosen?'':'disabled')}${result==='correct'?'':button('查看故事','toReveal','text-button')}`;}
+if(screen==='reveal')html=`${bar('故事揭晓','home')}<p class="eyebrow">你发现了</p><h2>${s.person}</h2><p class="muted">${s.title}</p>${art('full')}<p class="reader">${s.summary}</p><p class="reference">出处：${s.ref}<br><span class="small">以上为故事概述，并非经文逐字引用。</span></p>${button(state.collected.includes(storyID)?'已收藏 · 取消收藏':'收藏这个故事','save','secondary')}${button(storyID<6?'下一个故事':'打开收藏册',storyID<6?'next':'go:collection')}${button('返回故事库','leave','text-button')}`;
+if(screen==='detail')html=`${bar('故事详情','collection',button(state.collected.includes(storyID)?'已收藏':'收藏','save','icon-button'))}${art('full')}<h2>${s.person}</h2><h3>${s.title}</h3><p class="reader">${s.summary}</p><p class="reference">出处：${s.ref}</p>${button('查看大图','sheet:large','secondary')}${button('重新拼这幅画','replay')}<p class="explain">重玩不会删除已发现与收藏记录。正式图片可全屏缩放。</p>`;
+if(screen==='settings')html=`${bar('设置')}<h3>游玩体验</h3><label class="setting"><span>音效<small>遵守系统静音；仅拿放与完成时播放</small></span><input type="checkbox" data-setting="sound" ${state.settings.sound?'checked':''}></label><label class="setting"><span>触感反馈<small>关闭后仍有明确视觉反馈</small></span><input type="checkbox" data-setting="haptic" ${state.settings.haptic?'checked':''}></label><div class="block"><h3>阅读与无障碍</h3><div class="setting"><span>文字大小<small>跟随系统；阅读页面可放大</small></span><span class="small muted">系统</span></div><div class="setting"><span>减少动态效果<small>跟随系统；游戏没有持续动效</small></span><span class="small muted">系统</span></div></div><div class="block"><h3>关于</h3>${button('内容说明','sheet:content','setting')}${button('本地存档说明','sheet:storage','setting')}${button('清除本地进度','sheet:clear','setting danger')}</div><p class="explain">图片与进度保存在本机。删除App会删除本地内容。</p>`;
+if(customScreens.includes(screen))html=creatorHTML(screen);
+if(s.custom&&screen==='prepare')html=ownPrepareHTML(s,c);
+if(s.custom&&screen==='reveal')html=ownRevealHTML(s);
+if(s.custom&&screen==='detail')html=ownDetailHTML(s);
+if(screen==='collection')html=collectionHTML();
+document.getElementById('screen').classList.toggle('puzzle-screen',screen==='puzzle');
+document.getElementById('screen').innerHTML=html;
+afterCreatorRender();
+const bw=document.querySelector('.board-window');if(bw){bw.scrollLeft=state.current.panX||0;bw.scrollTop=state.current.panY||0;}const ts=document.querySelector('.fragment-tray');if(ts)ts.scrollTop=state.current.trayScroll||0;
+document.querySelectorAll('#screen img').forEach(img=>img.addEventListener('error',()=>{img.parentElement.classList.add('asset-failed');img.parentElement.insertAdjacentHTML('beforeend','<span>图片未能加载，请刷新重试。</span>');},{once:true}));
+document.getElementById('tabs').innerHTML=['home','collection','mysets'].includes(screen)?`<nav class="tabbar" aria-label="应用根页面">${button('故事','go:home',screen==='home'?'active':'')}${button('我的故事集','go:mysets',screen==='mysets'?'active':'')}${button('收藏','go:collection',screen==='collection'?'active':'')}</nav>`:'';
+document.querySelector('.pages').innerHTML=pages.map(([id,label])=>`<button class="page-link" data-action="inspect:${id}" ${screen===id?'aria-current="page"':''}>${label}</button>`).join('');
+const n=spec[screen];document.getElementById('notes').innerHTML=`<p class="label">页面设计说明</p><h2>${n.name}</h2><p class="intro">${n.goal}</p><section class="note-section"><h3>布局与交互</h3><ol>${n.layout.map(v=>`<li>${v}</li>`).join('')}</ol></section><section class="note-section"><h3>素材对应</h3><p>${n.assets}</p><p class="small muted">封面、完整预览和拼片共用同一故事原图。</p></section><section class="note-section"><h3>必须覆盖的状态</h3><p>${n.states}</p></section><section class="note-section"><h3>本稿边界</h3><p>网页已接入用户图片、互补拼片和拖动/提交校验。iPhone真机触控、原生布局、VoiceOver与发布级母版仍需单独验收。</p></section>`;
+document.getElementById('viewport').scrollTop=0;document.getElementById('screen').scrollTop=0;
+}
+function go(id){screen=id;sheet=null;render();}
+function showSheet(type){if(!document.querySelector('.sheet'))dialogReturn=document.activeElement;sheet=type;let body='';
+if(type==='pause')body=`<h3>已暂停</h3><p class="muted">进度已保存。${current()?`已摆放${state.current.placed.length}/${state.current.count}块。`:''}</p>${button('继续拼图','closeSheet')}${button('返回故事库','exit','secondary')}${button('重新开始','restart','text-button')}`;
+if(type==='preview'||type==='large'){if(current()){state.current.preview=true;persist();}body=`<h3>完整图片预览</h3><div class="preview-window">${art('full')}</div><div class="preview-tools">${button('放大图片','previewZoom','text-button')}<span class="small muted">不限次数 · 无惩罚</span></div>${button(screen==='prepare'?'返回关卡准备':screen==='detail'?'返回详情':'返回拼图','previewBack')}`;}
+if(type==='incomplete')body=`<h3>还没有摆放完整</h3><p>还有碎片未放入画面，请继续拼图。</p>${button('继续拼图','closeSheet')}`;
+if(type==='puzzleIncorrect')body=`<h3>还需要再调整一下</h3><p>拼图还有不一致的地方，可以对照原图继续调整。</p><p class="small muted">你的摆放已保留。</p>${button('继续调整','closeSheet')}${button('查看原图','sheet:preview','secondary')}`;
+if(type==='puzzleCorrect')body=`<h3>拼图正确</h3><p>画面拼好了。${isCustom(storyID)?(story().quizEnabled?'接下来回答一道题。':'欣赏图片，读一读它的故事。'):'接下来，认一认其中的人物。'}</p>${button(isCustom(storyID)?(story().quizEnabled?'回答问题':'查看故事'):'认一认人物','toGuess')}`;
+if(type==='restart')body=`<h3>重新开始这一关？</h3><p class="muted">当前未完成局会重置，已发现故事和收藏会保留。</p>${button('重新开始','restartConfirmed')}${button('取消','closeSheet','text-button')}`;
+if(type==='replace')body=`<h3>开始新的故事？</h3><p class="muted">首版只保留一个未完成局。旧局进度将被替换，已发现和收藏保留。</p>${button('开始新故事','replaceConfirmed')}${button('取消','closeSheet','text-button')}`;
+if(type==='content')body=`<h3>内容说明</h3><p>故事文字是独立概述，展示经文出处。逐字经文须先确定译本与使用条件。插画是艺术化表达，定稿前需核对情节。</p>${button('我知道了','closeSheet')}`;
+if(type==='storage')body=`<h3>本地存档</h3><p>图片、草稿、拼图进度和收藏仅保存到当前设备。没有账号或云端同步；删除App或清除网站数据会失去本地内容。</p>${button('我知道了','closeSheet')}`;
+if(type==='clear')body=`<h3>清除所有游玩进度？</h3><p>已发现、收藏和未完成局都会删除。我的故事集和草稿会保留。</p>${button('清除进度','resetConfirmed')}${button('取消','closeSheet','text-button')}`;
+document.getElementById('overlay').innerHTML=`<div class="modal-shade"><section class="sheet" role="dialog" aria-modal="true" aria-label="${type==='pause'?'暂停':type==='preview'?'完整图片预览':type==='puzzleCorrect'?'拼图正确':type==='puzzleIncorrect'?'拼图仍有错误':'操作说明'}">${body}</section></div>`;document.querySelector('.sheet button')?.focus();
+}
+function toast(text){const el=document.createElement('div');el.className='toast';el.setAttribute('role','status');el.textContent=text;document.getElementById('overlay').append(el);setTimeout(()=>el.remove(),1800);}
+function closeSheet(){const previous=sheet;sheet=null;document.getElementById('overlay').innerHTML='';if(previous==='restart'&&current())count=state.current.count;if(previous==='puzzleCorrect'&&['guess','reveal'].includes(current()?.phase)){dialogReturn=null;go(state.current.phase);return;}if(dialogReturn?.isConnected)dialogReturn.focus();else document.querySelector('#screen button')?.focus();dialogReturn=null;}
+document.addEventListener('click',e=>{const target=e.target.closest('[data-action]');if(!target)return;const [action,...parts]=target.dataset.action.split(':');const arg=parts.join(':');
+if(action==='go'){if(['home','collection'].includes(arg))persist();go(arg);return;}
+if(action==='inspect'){if(['puzzle','guess'].includes(arg))ensure();if(['guess','reveal'].includes(arg)&&current()?.submitResult!=='correct'&&!state.completed.includes(storyID)){toast('请先提交拼图并通过校验。');return;}go(arg);return;}
+if(action==='first'){storyID=1;count=12;go('prepare');return;}
+if(action==='resume'){if(state.current){storyID=state.current.storyID;count=state.current.count;go(state.current.phase);}else if(state.completed.filter(id=>id<=6).length===6){go('collection');}else{storyID=stories.find(s=>!s.custom&&!state.completed.includes(s.id)).id;go('prepare');}return;}
+if(action==='choose'){const id=Number(arg);if(id>1&&!state.completed.includes(id-1)){toast('完成前一个故事后开启。');return;}storyID=id;if(state.completed.includes(id)){go('detail');}else{count=current()?.count||12;go('prepare');}return;}
+if(action==='difficulty'){const value=Number(arg);if(current()&&value!==state.current.count){count=value;showSheet('restart');}else{count=value;render();}return;}
+if(action==='start'){if(state.current&&!current()){pendingStory=storyID;showSheet('replace');return;}if(!current())makeCurrent();go(state.current.phase);return;}
+if(action==='replaceConfirmed'){storyID=pendingStory;pendingStory=null;makeCurrent();go('puzzle');return;}
+if(action==='restart'){showSheet('restart');return;}
+if(action==='restartConfirmed'){makeCurrent();go('puzzle');return;}
+if(action==='pan'){state.current.panMode=!state.current.panMode;persist();renderKeepingPosition();return;}
+if(action==='zoom'){state.current.zoom=!state.current.zoom;state.current.panMode=false;state.current.panX=0;state.current.panY=0;persist();renderKeepingPosition();return;}
+if(action==='tray'){state.current.trayPage=Math.max(0,(state.current.trayPage||0)+Number(arg));persist();renderKeepingPosition();return;}
+if(action==='submit'){submitPuzzle();return;}
+if(action==='previewZoom'){const el=document.querySelector('.preview-window');el.classList.toggle('large');target.textContent=el.classList.contains('large')?'适合窗口':'放大图片';return;}
+if(action==='sheet'){showSheet(arg);return;}
+if(action==='closeSheet'){closeSheet();return;}
+if(action==='previewBack'){closeSheet();return;}
+if(action==='toGuess'){if(current()?.phase!=='guess'||current()?.submitResult!=='correct')return;go('guess');return;}
+if(action==='answer'){chosen=arg;result='';state.current.chosen=chosen;state.current.result=result;persist();render();return;}
+if(action==='confirm'){result=chosen===story().person?'correct':'wrong';state.current.result=result;persist();render();return;}
+if(action==='toReveal'){if(current()?.submitResult!=='correct')return;finish();state.current.phase='reveal';if(result!=='correct')state.current.result='revealed';persist();go('reveal');return;}
+if(action==='save'){if(!state.completed.includes(storyID)){toast('流程预览：先拼完并揭晓后才能收藏。');return;}const i=state.collected.indexOf(storyID);if(i>=0)state.collected.splice(i,1);else state.collected.push(storyID);persist();render();toast(i>=0?'已取消收藏':'已加入收藏');return;}
+if(action==='next'){storyID=Math.min(6,storyID+1);state.current=null;count=12;persist();go('prepare');return;}
+if(action==='leave'){state.current=null;persist();go('home');return;}
+if(action==='exit'){persist();go('home');return;}
+if(action==='filter'){filter=arg;render();return;}
+if(action==='open'){const id=Number(arg);if(!state.completed.includes(id)){toast('完成这个故事后，人物和插画会在这里揭晓。');return;}storyID=id;go('detail');return;}
+if(action==='replay'){count=12;go('prepare');return;}
+if(action==='reset'){showSheet('clear');return;}
+if(action==='resetConfirmed'){state=initial();storyID=1;count=12;selectedPiece=null;chosen=null;result='';persist();go('welcome');return;}
+});
+document.addEventListener('change',e=>{if(e.target.dataset.setting){state.settings[e.target.dataset.setting]=e.target.checked;persist();}});
+document.addEventListener('keydown',e=>{const dialog=document.querySelector('.sheet');if(!dialog)return;if(e.key==='Escape'){e.preventDefault();closeSheet();return;}if(e.key==='Tab'){const nodes=[...dialog.querySelectorAll('button:not(:disabled),a,input')];const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
+function normalizeGridSave(){const c=state.current;if(!c?.positions)return;const {cols,rows}=gridFor(c.count),used=new Set();for(const id of c.placed){const p=c.positions[id];if(!p)continue;let slot=Math.max(0,Math.min(rows-1,Math.floor(p.y*rows)))*cols+Math.max(0,Math.min(cols-1,Math.floor(p.x*cols)));if(used.has(slot)){delete c.positions[id];continue;}used.add(slot);c.positions[id]={...p,slot,x:(slot%cols+.5)/cols,y:(Math.floor(slot/cols)+.5)/rows};}c.placed=c.placed.filter(id=>c.positions[id]);persist();}
+// Fragment geometry is independent of placement. No target information is used while dragging.
+const sceneNames=['moses','noah','david','ruth','daniel','esther'];
+const sceneURL=(id=storyID)=>stories.find(s=>s.id===id)?.image||'assets/'+sceneNames[id-1]+'.jpg';
+const gridFor=n=>n===48?{cols:8,rows:6}:n===24?{cols:6,rows:4}:{cols:4,rows:3};
+function piecePath(id,n){
+ const {cols,rows}=gridFor(n),col=id%cols,row=Math.floor(id/cols);
+ let d='M 0 0';
+ function edge(x,y,dx,dy,nx,ny,sign){
+  const p=(t,h)=>`${x+dx*t+nx*h} ${y+dy*t+ny*h}`;
+  if(!sign){d+=` L ${p(1,0)}`;return;}
+  d+=` L ${p(.32,0)} C ${p(.4,0)} ${p(.32,18*sign)} ${p(.5,18*sign)} C ${p(.68,18*sign)} ${p(.6,0)} ${p(.68,0)} L ${p(1,0)}`;
+ }
+ const h=(r,c)=>(r*13+c*7)%2?1:-1,v=(r,c)=>(r*11+c*3)%2?1:-1;
+ edge(0,0,100,0,0,-1,row?h(row,col):0);
+ edge(100,0,0,100,1,0,col<cols-1?v(row,col+1):0);
+ edge(100,100,-100,0,0,1,row<rows-1?-h(row+1,col):0);
+ edge(0,100,0,-100,-1,0,col?-v(row,col):0);
+ return d+' Z';
+}
+function pieceSVG(id,where='tray'){
+ const {cols,rows}=gridFor(count),col=id%cols,row=Math.floor(id/cols),clip=`p-${where}-${storyID}-${id}`;
+ const d=piecePath(id,count);
+ return `<svg viewBox="-22 -22 144 144" preserveAspectRatio="none" aria-hidden="true" draggable="false"><defs><clipPath id="${clip}"><path d="${d}"/></clipPath><clipPath id="hit-${clip}" clipPathUnits="objectBoundingBox"><path d="${d}" transform="scale(0.0069444444) translate(22 22)"/></clipPath></defs><image href="${sceneURL()}" x="${-col*100}" y="${-row*100}" width="${cols*100}" height="${rows*100}" preserveAspectRatio="none" clip-path="url(#${clip})"/><path d="${d}" fill="none" stroke="rgba(0,0,0,.22)" stroke-width=".7"/></svg>`;
+}
+function puzzleHTML(){
+ const c=state.current,{cols,rows}=gridFor(count),remaining=c.trayOrder.filter(id=>!c.positions[id]);
+ const page=remaining,placed=Object.keys(c.positions).length;
+ const board=c.placed.map(id=>{const p=c.positions[id];return `<button class="fragment on-board" data-piece="${id}" aria-label="已摆放图像碎片；方向键移动到相邻格，Delete退回托盘" style="left:${p.x*100}%;top:${p.y*100}%;width:${144/cols}%;height:${144/rows}%;z-index:${p.z};clip-path:url(#hit-p-board-${storyID}-${id})">${pieceSVG(id,'board')}</button>`}).join('');
+ return `<div class="puzzle-content"><div class="bar">${button('关闭','exit','icon-button')}<strong>${number(storyID)} · ${count}块</strong>${button('暂停','sheet:pause','icon-button')}</div><div class="row"><span>已摆放 ${placed}/${count}</span><span class="small muted">摆放时不判对错</span></div><div class="progress"><i style="width:${placed/count*100}%"></i></div><div class="play-tools">${button('查看原图','sheet:preview','text-button')}${button(c.zoom?'适合画框':'放大棋盘','zoom','text-button')}${c.zoom?button(c.panMode?'继续摆放':'浏览棋盘','pan','text-button',`aria-pressed="${!!c.panMode}"`):''}</div><div class="board-window ${c.zoom?'enlarged':''}" aria-label="画框滚动区域"><div class="free-board ${c.zoom?'zoomed':''} ${c.panMode?'pan-mode':''}" aria-label="网格拼图画框，按难度划分的格子"><div class="board-grid" style="grid-template-columns:repeat(${cols},1fr);grid-template-rows:repeat(${rows},1fr)">${Array.from({length:count},()=>'<div class="board-cell"></div>').join('')}</div>${board}</div></div><div class="row tray-label"><strong>碎片托盘 · 剩余 ${remaining.length}</strong><span class="small muted">拖回这里可取下</span></div><div class="fragment-tray" aria-label="乱序碎片托盘">${page.map(id=>`<button class="fragment in-tray" data-piece="${id}" aria-label="待摆放图像碎片；按Enter移入画框后用方向键换格" style="--piece-ratio:${4*rows/(3*cols)}">${pieceSVG(id)}</button>`).join('')}${!remaining.length?'<span class="small muted tray-empty">可以继续移动画面中的碎片。</span>':''}</div><p class="tray-summary">全部碎片 · 上下滚动查看更多</p><div class="submit-dock">${button('提交拼图','submit')}<p class="small muted game-help">对照原图，觉得拼好了再提交。</p></div></div>`;
+}
+function renderKeepingPosition(focusID=null){
+ const screenEl=document.getElementById('screen'),scroll=screenEl.scrollTop,bw=document.querySelector('.board-window');
+ if(bw){state.current.panX=bw.scrollLeft;state.current.panY=bw.scrollTop;}const tray=document.querySelector('.fragment-tray');if(tray)state.current.trayScroll=tray.scrollTop;
+ render();screenEl.scrollTop=scroll;
+ if(focusID!==null)document.querySelector(`[data-piece="${focusID}"]`)?.focus({preventScroll:true});
+}
+function syncPlaced(){state.current.placed=Object.keys(state.current.positions).map(Number).sort((a,b)=>state.current.positions[a].z-state.current.positions[b].z);}
+function dropPiece(id,x,y){const c=state.current,{cols,rows}=gridFor(count),col=Math.max(0,Math.min(cols-1,Math.floor(x*cols))),row=Math.max(0,Math.min(rows-1,Math.floor(y*rows))),slot=row*cols+col,old=c.positions[id];const occupant=Object.keys(c.positions).find(other=>Number(other)!==id&&c.positions[other].slot===slot);if(occupant!==undefined){if(old)c.positions[occupant]={...old,z:++c.layer};else delete c.positions[occupant];}c.positions[id]={slot,x:(col+.5)/cols,y:(row+.5)/rows,z:++c.layer};c.submitResult='';syncPlaced();persist();}
+function returnPiece(id){delete state.current.positions[id];state.current.submitResult='';syncPlaced();persist();}
+function submitPuzzle(){
+ const c=current();if(!c||c.phase!=='puzzle')return;
+ c.submitAttempts=(c.submitAttempts||0)+1;
+ if(Object.keys(c.positions).length!==count){c.submitResult='incomplete';persist();showSheet('incomplete');return;}
+ const {cols,rows}=gridFor(count);
+ const valid=Array.from({length:count},(_,id)=>{const p=c.positions[id];return p&&p.slot===id;}).every(Boolean);
+ c.submitResult=valid?'correct':'incorrect';
+ if(valid){c.phase=isCustom(storyID)&&!story().quizEnabled?'reveal':'guess';if(!creator.trial&&!state.completed.includes(storyID))state.completed.push(storyID);}
+ persist();showSheet(valid?'puzzleCorrect':'puzzleIncorrect');
+}
+let drag=null;
+function moveGhost(e){
+ const {cols,rows}=gridFor(count),board=document.querySelector('.free-board').getBoundingClientRect();
+ const offset=e.pointerType==='touch'?28:0;
+ drag.x=e.clientX;drag.y=e.clientY-offset;
+ drag.ghost.style.width=board.width/cols*1.44+'px';drag.ghost.style.height=board.height/rows*1.44+'px';
+ drag.ghost.style.left=drag.x+'px';drag.ghost.style.top=drag.y+'px';
+}
+document.addEventListener('pointerdown',e=>{
+ const el=e.target.closest('[data-piece]');if(!el||state.current?.panMode||screen!=='puzzle'||sheet||drag||e.button!==0||state.current.phase!=='puzzle')return;
+ e.preventDefault();el.focus({preventScroll:true});
+ drag={id:Number(el.dataset.piece),el,pointer:e.pointerId,startX:e.clientX,startY:e.clientY,active:false};
+ el.setPointerCapture(e.pointerId);
+});
+document.addEventListener('pointermove',e=>{
+ if(!drag||e.pointerId!==drag.pointer)return;
+ if(!drag.active&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)<6)return;
+ e.preventDefault();
+ if(!drag.active){drag.active=true;drag.ghost=document.createElement('div');drag.ghost.className='drag-ghost';drag.ghost.innerHTML=pieceSVG(drag.id,'ghost');document.body.append(drag.ghost);drag.el.classList.add('dragging');}
+ moveGhost(e);
+});
+function cancelDrag(){if(!drag)return;drag.ghost?.remove();drag.el.classList.remove('dragging');if(drag.el.hasPointerCapture?.(drag.pointer))drag.el.releasePointerCapture(drag.pointer);drag=null;}
+document.addEventListener('pointerup',e=>{
+ if(!drag||e.pointerId!==drag.pointer)return;
+ const d=drag;if(!d.active){cancelDrag();return;}
+ moveGhost(e);
+ const board=document.querySelector('.free-board').getBoundingClientRect(),view=document.querySelector('.board-window').getBoundingClientRect(),tray=document.querySelector('.fragment-tray').getBoundingClientRect();
+ const inside=(r,x,y)=>x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+ const onBoard=inside(view,d.x,d.y)&&inside(board,d.x,d.y);
+ if(onBoard)dropPiece(d.id,(d.x-board.left)/board.width,(d.y-board.top)/board.height);
+ else if(inside(tray,e.clientX,e.clientY))returnPiece(d.id);
+ cancelDrag();renderKeepingPosition();
+});
+document.addEventListener('pointercancel',cancelDrag);
+window.addEventListener('blur',cancelDrag);
+document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();persist();}});
+document.addEventListener('scroll',e=>{
+ if(e.target.classList?.contains('fragment-tray')&&current()){state.current.trayScroll=e.target.scrollTop;persist();}
+ if(e.target.classList?.contains('board-window')&&current()){state.current.panX=e.target.scrollLeft;state.current.panY=e.target.scrollTop;persist();}
+},true);
+document.addEventListener('keydown',e=>{
+ const el=e.target.closest?.('[data-piece]');if(!el||state.current?.panMode||screen!=='puzzle'||sheet||state.current.phase!=='puzzle')return;
+ const id=Number(el.dataset.piece),p=state.current.positions[id];
+ if(e.key==='Enter'&&!p){e.preventDefault();dropPiece(id,.5,.5);renderKeepingPosition(id);return;}
+ if(e.key==='Delete'&&p){e.preventDefault();returnPiece(id);renderKeepingPosition(id);return;}
+ if(!p||!['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))return;
+ e.preventDefault();const {cols,rows}=gridFor(count);const step=1/cols;
+ dropPiece(id,Math.max(0,Math.min(1,p.x+(e.key==='ArrowRight'?step:e.key==='ArrowLeft'?-step:0))),Math.max(0,Math.min(1,p.y+(e.key==='ArrowDown'?1/rows:e.key==='ArrowUp'?-1/rows:0))));
+ renderKeepingPosition(id);
+});
+
+</script>
+<script src="故事集.js"></script>
+<script src="native.js"></script>
+<script>
+recoverTrial();
+normalizeGridSave();
+render();
+initCreator();
+</script>
+</body>
+</html>
