@@ -45,8 +45,8 @@ jobs:
           if-no-files-found: error
       - name: Select available iPhone simulator
         run: python3 scripts/simulator-destination.py >> "$GITHUB_ENV"
-      - name: Test offline launch and native picker bridge
-        timeout-minutes: 9
+      - name: Launch application in iPhone simulator
+        timeout-minutes: 5
         shell: bash
         run: |
           set -euo pipefail
@@ -61,6 +61,20 @@ jobs:
           curl --max-time 15 -v http://127.0.0.1:18765/index.html -o launch-page.html 2>local-server.log || true
           xcrun simctl io "$PUZZLE_SIMULATOR" screenshot simulator-launch.png
           xcrun simctl terminate "$PUZZLE_SIMULATOR" com.iszkq.biblestorypuzzle || true
+      - name: Upload simulator launch evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulator-launch-evidence
+          path: |
+            simulator-launch.png
+            local-server.log
+            launch-page.html
+      - name: Test offline launch and native picker bridge
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          set -euo pipefail
           xcodebuild -project ios/BibleStoryPuzzle.xcodeproj \
             -scheme BibleStoryPuzzle -configuration Debug \
             -destination "id=$PUZZLE_SIMULATOR" -derivedDataPath simulator-build \
