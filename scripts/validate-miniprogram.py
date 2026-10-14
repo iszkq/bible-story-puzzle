@@ -11,6 +11,7 @@ packages=[mini/p['root'] for p in config['subpackages']]
 for page in config['pages']:
     for ext in ['js','json','wxml','wxss']: assert (mini/(page+'.'+ext)).is_file()
 for package in config['subpackages']:
+    assert (mini/package['root']/'resources.js').is_file(), 'Missing asynchronous resource entry'
     for page in package['pages']:
         for ext in ['js','json','wxml','wxss']: assert (mini/package['root']/(page+'.'+ext)).is_file()
 sizes={p.name:sum(f.stat().st_size for f in p.rglob('*') if f.is_file()) for p in packages}

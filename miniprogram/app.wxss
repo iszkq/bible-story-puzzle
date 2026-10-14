@@ -11,7 +11,8 @@ page {
 @media (prefers-color-scheme: dark) {
   page { --bg: #000; --surface: #1c1c1e; --text: #fff; --muted: #aeaeb2; --accent: #0a84ff; --border: #38383a; --selected: #152c48; --error: #ff6a62; }
 }
-button { color: var(--text); font-size: var(--body); margin: 0; padding: var(--s3) var(--s4); min-height: var(--target); line-height: 1.5; background: transparent; border-radius: var(--button-radius); }
-button::after { border: 0; }
-button[disabled] { opacity: .45; color: var(--muted); }
+/* Match or exceed WeChat v2's button:not([size=mini]) specificity. */
+.page button { box-sizing:border-box; width:auto; color: var(--text); font-size: var(--body); font-weight:400; margin: 0; padding: var(--s3) var(--s4); min-height: var(--target); line-height: 1.5; background: transparent; border-radius: var(--button-radius); }
+.page button::after { border: 0; }
+.page button[disabled] { opacity: .45; color: var(--muted); }
 input,textarea { font-size: var(--body); color: var(--text); }

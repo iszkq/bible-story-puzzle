@@ -5,12 +5,13 @@
   "description": "Offline Bible story and personal image puzzle for iOS",
   "scripts": {
     "start": "node scripts/serve.cjs",
-    "test": "node scripts/run-tests.cjs && node tests/miniprogram.cjs",
-    "test:mini": "node tests/miniprogram.cjs",
+    "test": "node scripts/run-tests.cjs && node tests/miniprogram.cjs && node tests/miniprogram-media.cjs && node tests/miniprogram-renderer.cjs",
+    "test:mini": "node tests/miniprogram.cjs && node tests/miniprogram-media.cjs && node tests/miniprogram-renderer.cjs && node tests/miniprogram-flows.cjs",
     "sync:mini": "python scripts/sync-miniprogram.py",
     "test:game": "node tests/minigame.cjs",
     "sync:game": "python scripts/sync-minigame.py",
-    "test:mini:ui": "node tests/miniprogram-ui.cjs"
+    "test:mini:ui": "node tests/miniprogram-ui.cjs",
+    "test:mini:wechat": "node tests/wechat-runtime.cjs"
   },
   "devDependencies": {
     "playwright": "1.56.1"

@@ -56,10 +56,14 @@ function createStore(api){
     const item={id:uid(),source,width,height,title:'',text:'',reference:'',quiz:blankQuiz(),fit:'crop',x:50,y:50,zoom:1,difficulty:12,image:'',sceneKey:''};
     state.draft.items.push(item);if(!state.draft.coverID)state.draft.coverID=item.id;save();return item;
   }
+  function validateItem(item){
+    if(!item.image)throw Error('请先完成每张图片的编辑。');
+    const q=item.quiz;if(q.enabled&&(!q.question.trim()||q.options.some(o=>!o.trim())||new Set(q.options.map(o=>o.trim())).size!==3||![0,1,2].includes(Number(q.answer))))throw Error('题目需要完整问题、三个不重复选项及正确答案。');
+  }
   function validateDraft(){
     const d=state.draft;if(!d||!d.name.trim())throw Error('请填写图片集名称。');
     if(!d.items.length)throw Error('请添加至少一张图片。');
-    for(const item of d.items){if(!item.image)throw Error('请先完成每张图片的编辑。');const q=item.quiz;if(q.enabled&&(!q.question.trim()||q.options.some(o=>!o.trim())||new Set(q.options.map(o=>o.trim())).size!==3||![0,1,2].includes(Number(q.answer))))throw Error('题目需要完整问题、三个不重复选项及正确答案。');}
+    for(const item of d.items)validateItem(item);
   }
   function commit(){
     validateDraft();const before=clone(state),d=state.draft,setID=d.editID||uid();
@@ -78,11 +82,13 @@ function createStore(api){
     return set;
   }
   function trial(item){
+    validateItem(item);
     // Draft preview has its own version. It never changes the saved library or old game.
     const id='trial-'+uid();
+    const before=clone(state);
     state.versions=state.versions.filter(v=>!String(v.id).startsWith('trial-'));
     state.versions.push({...clone(item),id,title:item.title||'试玩图片'});
-    return start(id,item.difficulty,true);
+    try{return start(id,item.difficulty,true);}catch(e){state=before;throw e;}
   }
   function resetProgress(){state.completed=[];state.collected=[];state.current=null;state.trialBackup=null;save();}
   function recover(){blocked=false;state=initial();warning='';save();}

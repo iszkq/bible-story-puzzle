@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-14",
+  "runtime": "WeChat IDE 3.7.12",
+  "checks": [
+    "Welcome, story library, locked scene and preparation",
+    "iOS preview sheet: fit, zoom, scroll, close, same session",
+    "12 pieces: drag, neutral placement, occupied swap, cancel, adjustment, zoom, preview, pause/resume",
+    "24 pieces: drag, neutral placement, occupied swap, cancel, adjustment, zoom, preview, pause/resume",
+    "48 pieces: drag, neutral placement, occupied swap, cancel, adjustment, zoom, preview, pause/resume",
+    "Incomplete / incorrect submit sheets preserve positions; correct submit, wrong/right answer, reveal, favorites and next",
+    "All 24 official full-resolution scenes open in the same iOS preview sheet",
+    "Create collection, empty-name validation and batch import of landscape / portrait photos",
+    "Cover / ordering, crop / contain, quiz validation, all trial difficulties and restoration",
+    "Saved personal scene play, immutable crop versions, replace / remove, deleting set retains old session",
+    "Settings, storage/content panels, save failure recovery, damaged-index protection"
+  ],
+  "errors": [],
+  "userStorageUnchanged": true,
+  "limitations": [
+    "模拟器验收；系统照片选择结果模拟，后续图片处理真实执行",
+    "未验证微信真机权限、静音、实际触感与性能"
+  ]
+}

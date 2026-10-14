@@ -2,12 +2,12 @@
 const Shared=require('../../shared'),Store=require('../../store'),Media=require('../../media'),Renderer=require('../../renderer');
 const ROOTS=['home','collection','mysets'];
 Page({
-  data:{screen:'welcome',busy:false,error:'',notice:'',selected:null,adjusting:false,homeScene:'',dragging:false,ghost:null,atlas:'',atlasRows:3,filter:'saved',count:12,baseWidth:335,boardWidth:335,boardHeight:251.25,boardWindowHeight:251.25,panX:0,panY:0,trayScroll:0,dark:false,difficulties:[{count:12,label:'轻松',grid:'4列 × 3行'},{count:24,label:'标准',grid:'6列 × 4行'},{count:48,label:'困难',grid:'8列 × 6行'}],safeBottom:0},
+  data:{modalOpen:false,modalTitle:'',modalContent:'',modalConfirm:'',modalCancel:'',previewOpen:false,previewLarge:false,previewPath:'',previewError:'',previewLoading:false,previewMaxHeight:430,previewX:0,previewY:0,previewBack:'返回拼图',cropWidth:1600,cropHeight:1200,screen:'welcome',busy:false,error:'',notice:'',selected:null,adjusting:false,homeScene:'',dragging:false,ghost:null,boardFrames:[{key:'empty-0',src:''},{key:'empty-1',src:''}],boardFront:0,atlas:'',atlasRows:3,atlasWidth:576,atlasHeight:432,filter:'saved',count:12,baseWidth:335,boardWidth:335,boardHeight:251.25,boardWindowHeight:251.25,panX:0,panY:0,trayScroll:0,dark:false,difficulties:[{count:12,label:'轻松',grid:'4列 × 3行'},{count:24,label:'标准',grid:'6列 × 4行'},{count:48,label:'困难',grid:'8列 × 6行'}],safeBottom:0},
   onLoad(){
     this.store=Store.createStore(wx);this.renderer=new Renderer(this);this.storyID=1;this.setID=null;this.itemID=null;
     const info=wx.getWindowInfo(),width=info.windowWidth-(info.windowWidth<=375?32:40);
     const appInfo=wx.getAppBaseInfo();
-    this.setData({baseWidth:width,boardWidth:width,boardHeight:width*.75,boardWindowHeight:width*.75,safeBottom:Math.max(0,info.screenHeight-(info.safeArea?info.safeArea.bottom:info.screenHeight)),dark:appInfo.theme==='dark'});
+    this.setData({baseWidth:width,boardWidth:width,boardHeight:width*.75,boardWindowHeight:width*.75,previewMaxHeight:Math.min(430,info.windowHeight*.55),safeBottom:Math.max(0,info.screenHeight-(info.safeArea?info.safeArea.bottom:info.screenHeight)),dark:appInfo.theme==='dark',previewOpen:false,previewLarge:false,previewPath:'',previewError:'',previewLoading:false,cropWidth:1600,cropHeight:1200});
     this.themeHandler=e=>{this.setData({dark:e.theme==='dark'});this.renderer.draw();};
     wx.onThemeChange(this.themeHandler);
     this.screen=this.store.state.welcomed?'home':'welcome';this.render();
@@ -19,36 +19,48 @@ Page({
   save(){try{this.store.save();this.setData({error:''});return true;}catch(e){this.setData({error:e.message});return false;}},
   fail(e){this.setData({error:e.message||e.errMsg||'操作未完成，请重试。',busy:false});},
   toast(title){wx.showToast({title,icon:'none'});},
-  modal(title,content,confirmText='继续'){return new Promise(resolve=>wx.showModal({title,content,confirmText,success:r=>resolve(r.confirm),fail:()=>resolve(false)}));},
+  modal(title,content,confirmText='继续',cancelText='取消'){
+    this.closeModal(false);
+    return new Promise(resolve=>{this.modalResolve=resolve;this.setData({modalOpen:true,modalTitle:title,modalContent:content,modalConfirm:confirmText,modalCancel:cancelText});});
+  },
+  closeModal(confirm=false){const resolve=this.modalResolve;this.modalResolve=null;this.setData({modalOpen:false});if(resolve)resolve(confirm);},
+  modalConfirm(){this.closeModal(true);},
+  modalCancel(){this.closeModal(false);},
+  async pauseRestart(){this.closeModal(true);if(await this.modal('重新开始这一关？','当前未完成局会重置，已发现故事和收藏会保留。','重新开始'))await this.start(true);},
+  async modalPreview(){this.closeModal(false);await this.preview();},
   story(){return this.store.story(this.storyID)||this.store.story(1);},
   draftItem(){return this.store.state.draft&&this.store.state.draft.items.find(i=>i.id===this.itemID);},
   row(s,index){
     const state=this.store.state,done=state.completed.includes(s.id),running=state.current&&state.current.storyID===s.id,locked=!s.custom&&s.id>1&&!state.completed.includes(s.id-1);
-    return {...s,thumb:Media.thumb(s),label:s.custom?s.title:done?s.person+' · '+s.title:'故事'+String(s.id).padStart(2,'0'),status:done?'已发现 · 可重玩':locked?'完成前一幅后开启':running?'继续上次拼图':'12 / 24 / 48块',locked,index};
+    return {...s,found:done,thumb:Media.thumb(s),label:s.custom?s.title:done?s.person+' · '+s.title:'故事'+String(s.id).padStart(2,'0'),status:done?'已发现 · 可重玩':locked?'完成前一幅后开启':running?'继续上次拼图':'12 / 24 / 48块',locked,index};
   },
   render(){
     const state=this.store.state,s=this.story(),c=state.current,official=Shared.stories.map(s=>this.row({...s,custom:false}));
     const next=Shared.stories.find(s=>!state.completed.includes(s.id))||Shared.stories[0],shown=c?(this.store.story(c.storyID)||next):next;
-    const rows=this.data.filter==='all'?official.concat(state.versions.filter(v=>state.completed.includes(v.id)&&!String(v.id).startsWith('trial-')).map(v=>this.row(this.store.story(v.id)))):state.collected.map(id=>this.store.story(id)).filter(Boolean).map(v=>this.row(v));
+    const rows=this.data.filter==='all'?official.concat(state.sets.flatMap(set=>set.items.map(i=>this.store.story(i.version))).filter(Boolean).map(v=>this.row(v))):state.collected.map(id=>this.store.story(id)).filter(Boolean).map(v=>this.row(v));
     const sets=state.sets.map(set=>{const cover=state.versions.find(v=>v.id===(set.items.find(i=>i.id===set.coverID)||set.items[0]||{}).version);return {...set,cover:cover?cover.image:'',size:set.items.length};});
     const set=sets.find(s=>s.id===this.setID),draft=state.draft,item=this.draftItem();
     const g=Shared.gridFor(c?c.count:this.data.count),zoomScale=Math.max(1.65,g.cols*44/this.data.baseWidth,g.rows*44/(this.data.baseWidth*.75)),boardWidth=this.data.baseWidth*(c&&c.zoom?zoomScale:1),tray=c?c.trayOrder.filter(id=>!c.positions[id]).map(id=>({id,col:id%4,row:Math.floor(id/4)})):[];
     const setItems=set?set.items.map((i,index)=>this.row(this.store.story(i.version),index)):[];
     this.setData({screen:this.screen,root:ROOTS.includes(this.screen),story:s,storyLabel:this.row(s).label,thumb:Media.thumb(s),official,collection:rows,sets,set:set||null,setItems,draft:draft||null,item:item||null,settings:state.settings,current:c||null,shown:this.row({...shown,custom:!!shown.custom}),completed:state.completed.length,officialCompleted:official.filter(s=>state.completed.includes(s.id)).length,collected:state.collected.includes(s.id),session:c||null,placed:c?c.placed.length:0,tray,cellWidth:boardWidth/g.cols,cellHeight:boardWidth*.75/g.rows,boardWidth,boardHeight:boardWidth*.75,boardWindowHeight:this.data.baseWidth*.75,pieceRatio:4*g.rows/(3*g.cols),panX:c?c.panX:0,panY:c?c.panY:0,trayScroll:c?c.trayScroll:0,trial:!!(c&&c.trial),error:this.store.warning||this.data.error,blocked:this.store.blocked,quality:item?(item.width+' × '+item.height+'像素 · '+(Math.min(item.width,item.height)<600?'清晰度较低，建议先用12块':'建议检查48块的细节')):''});
     this.setData({trayPieceHeight:54,trayPieceWidth:54*4*g.rows/(3*g.cols)});
-    this.setData({savedCount:state.collected.length});
+    const ownSet=s.custom?state.sets.find(set=>set.id===s.setID):null,ownIndex=ownSet?ownSet.items.findIndex(i=>i.version===s.id):-1;
+    this.setData({hasOwnNext:!!(ownSet&&ownSet.items[ownIndex+1]),savedCount:state.collected.length,recentCollected:state.collected.slice(-2).map(id=>(this.store.story(id)||{}).person||'我的图片').join(' · ')});
     wx.setNavigationBarTitle({title:this.screen==='puzzle'?'拼图 · '+c.count+'块':'拾光拼图册'});
-    if(this.screen==='puzzle')wx.nextTick(()=>{
+    if(this.screen==='puzzle'){
+      if(!this.renderer||!this.renderer.ctx||this.puzzleKey!==c.storyID+':'+c.count)this.setData({busy:true});
+      wx.nextTick(()=>{
       const key=c.storyID+':'+c.count;
-      if(this.renderer.ctx&&this.puzzleKey===key){this.renderer.draw();this.measure();}
+      if(this.renderer&&this.renderer.ctx&&this.puzzleKey===key){this.renderer.draw();this.measure();}
       else this.loadPuzzle();
-    });
+      });
+    }
     if(this.screen==='imageedit')this.scheduleCrop();
     if(['prepare','guess','reveal','detail'].includes(this.screen))this.loadScene();
     if(this.screen==='home')this.loadHome(shown);
   },
   go(screen){
-    this.cancelDrag();if(this.screen==='puzzle'&&screen!=='puzzle')this.renderer.dispose();
+    this.closePreview();this.closeModal(false);this.cancelDrag(false);if(this.screen==='puzzle'&&screen!=='puzzle'){this.puzzleLoadSerial=(this.puzzleLoadSerial||0)+1;this.loadingPuzzle=false;this.renderer.dispose();this.setData({busy:false});}
     this.screen=screen;this.setData({error:'',selected:null,adjusting:false,notice:''});this.render();wx.pageScrollTo({scrollTop:0,duration:0});
   },
   async loadHome(shown){
@@ -65,22 +77,33 @@ Page({
   },
   async loadPuzzle(){
     if(this.loadingPuzzle)return;
+    const serial=this.puzzleLoadSerial=(this.puzzleLoadSerial||0)+1;
     this.loadingPuzzle=true;this.setData({busy:true});
-    try{const c=this.store.state.current;if(!c)return;const path=await Media.scene(this.store.story(c.storyID));if(this.screen!=='puzzle')return;await this.renderer.init(path,c.count);this.puzzleKey=c.storyID+':'+c.count;this.setData({scene:path});this.measure();}
-    catch(e){this.fail(e);}finally{this.loadingPuzzle=false;this.setData({busy:false});}
+    try{const c=this.store.state.current;if(!c)return;const path=await Media.scene(this.store.story(c.storyID));if(this.screen!=='puzzle'||serial!==this.puzzleLoadSerial)return;await this.renderer.init(path,c.count);if(serial!==this.puzzleLoadSerial||this.screen!=='puzzle')return;this.puzzleKey=c.storyID+':'+c.count;this.setData({scene:path});this.measure();}
+    catch(e){if(serial===this.puzzleLoadSerial)this.fail(e);}finally{if(serial===this.puzzleLoadSerial){this.loadingPuzzle=false;this.setData({busy:false});}}
   },
-  measure(){wx.createSelectorQuery().in(this).select('#board').boundingClientRect().select('#board-window').boundingClientRect().select('#tray').boundingClientRect().exec(r=>{this.boardRect=r[0];this.boardView=r[1];this.trayRect=r[2];});},
+  measure(){if(this.screen!=='puzzle')return;return new Promise(resolve=>this.createSelectorQuery().select('#board').boundingClientRect().select('#board-window').boundingClientRect().select('#tray').boundingClientRect().exec(r=>{this.boardRect=r[0];this.boardView=r[1];this.trayRect=r[2];resolve(r);}));},
   async feedback(complete=false){
     const settings=this.store.state.settings;
     if(settings.haptic)wx.vibrateShort({type:'light',fail:()=>{}});
     if(settings.sound){if(!this.audio){this.audio=wx.createInnerAudioContext();this.audio.obeyMuteSwitch=true;this.audio.onError(()=>{});}this.audio.stop();this.audio.src='/assets/'+(complete?'complete':'place')+'.wav';this.audio.play();}
   },
-  async preview(){try{const path=await Media.scene(this.story());await Media.invoke('previewImage',{current:path,urls:[path]});}catch(e){this.fail(e);}},
+  async preview(){
+    this.cancelDrag();
+    const serial=this.previewSerial=(this.previewSerial||0)+1;
+    this.setData({previewOpen:true,previewLarge:false,previewPath:'',previewError:'',previewLoading:true,previewX:0,previewY:0,previewBack:this.screen==='prepare'?'返回关卡准备':this.screen==='detail'?'返回详情':this.screen==='reveal'?'返回故事':'返回拼图'});
+    try{const path=await Media.scene(this.story());if(serial===this.previewSerial&&this.data.previewOpen)this.setData({previewPath:path});}
+    catch(e){if(serial===this.previewSerial)this.setData({previewError:e.message||'图片未能显示，请重试。',previewLoading:false});}
+  },
+  closePreview(){this.previewSerial=(this.previewSerial||0)+1;this.setData({previewOpen:false,previewPath:'',previewError:'',previewLoading:false});},
+  previewZoom(){this.setData({previewLarge:!this.data.previewLarge,previewX:0,previewY:0});},
+  previewReady(e){if(e.currentTarget.dataset.src===this.data.previewPath)this.setData({previewLoading:false,previewError:''});},
+  previewFailed(e){if(e.currentTarget.dataset.src===this.data.previewPath)this.setData({previewLoading:false,previewError:'图片未能显示，请重试。'});},
   async start(restart=false){
     const c=this.store.state.current,count=this.data.count;
     if(!restart&&c&&c.storyID===this.storyID&&c.count===count){this.go(c.phase);return;}
     if(c&&!c.trial&&(c.phase==='puzzle'||c.storyID===this.storyID)&&!(await this.modal('开始新的拼图？','当前未完成局将被替换，已发现和收藏会保留。','开始新局')))return;
-    this.store.start(this.storyID,count);this.go('puzzle');
+    this.store.start(this.storyID,count,!!(c&&c.trial));this.go('puzzle');
   },
   async act(e){
     if(this.data.busy)return;
@@ -90,13 +113,15 @@ Page({
       if(action==='go'){this.go(arg);return;}
       if(action==='first'){state.welcomed=true;this.save();this.storyID=1;this.setData({count:12});this.go('prepare');return;}
       if(action==='resume'){if(state.current){this.storyID=state.current.storyID;this.setData({count:state.current.count});this.go(state.current.phase);}else{this.storyID=(Shared.stories.find(s=>!state.completed.includes(s.id))||Shared.stories[0]).id;this.go('prepare');}return;}
+      if(action==='open'){if(!state.completed.includes(arg)){this.toast('完成这个故事后，人物和插画会在这里揭晓。');return;}const story=this.store.story(arg);if(!story)return;this.storyID=arg;this.setID=story.setID||null;this.go('detail');return;}
+      if(action==='backSet'){if(state.current&&state.current.trial){this.store.endTrial();this.go('imageedit');}else if(state.sets.some(set=>set.id===this.setID))this.go('setdetail');else this.go('mysets');return;}
       if(action==='choose'){const s=this.store.story(arg);if(!s)return;if(this.row(s).locked){this.toast('完成前一幅后开启');return;}if(s.custom)this.setID=s.setID;this.storyID=s.id;this.setData({scene:'',count:state.current&&state.current.storyID===s.id?state.current.count:12});this.go(state.completed.includes(s.id)?'detail':'prepare');return;}
       if(action==='difficulty'){this.setData({count:Number(arg)});return;}
       if(action==='start'){await this.start();return;}
       if(action==='restart'){if(await this.modal('重新开始这一关？','当前局将重置，已发现与收藏保留。','重新开始'))await this.start(true);return;}
       if(action==='preview'){await this.preview();return;}
       if(action==='retry'){if(this.screen==='puzzle')await this.loadPuzzle();else if(this.screen==='imageedit')this.scheduleCrop();else if(this.screen==='home'){this.homeKey=null;await this.loadHome(this.data.shown);}else await this.loadScene();return;}
-      if(action==='pause'){const again=await this.modal('已暂停','进度已保存，可继续拼图或返回画册。','继续拼图');if(!again){if(state.current.trial){this.store.endTrial();this.go('imageedit');}else this.go('home');}return;}
+      if(action==='pause'){const again=await this.modal('已暂停','进度已保存。已摆放'+state.current.placed.length+'/'+state.current.count+'块。','继续拼图',state.current.trial?'结束试玩':'返回故事库');if(!again){if(state.current.trial){this.store.endTrial();this.go('imageedit');}else this.go('home');}return;}
       if(action==='exit'){if(state.current&&state.current.trial){this.store.endTrial();this.go('imageedit');}else this.go('home');return;}
       if(action==='zoom'){state.current.zoom=!state.current.zoom;state.current.panMode=false;state.current.panX=0;state.current.panY=0;this.save();this.render();return;}
       if(action==='pan'){state.current.panMode=!state.current.panMode;this.save();this.render();return;}
@@ -106,8 +131,8 @@ Page({
       if(action==='move'){const id=this.data.selected,p=state.current.positions[id];if(id===null)return;const g=Shared.gridFor(state.current.count),x=p?p.x:.5,y=p?p.y:.5;Shared.dropPiece(state.current,id,x+(arg==='right'?1/g.cols:arg==='left'?-1/g.cols:0),y+(arg==='down'?1/g.rows:arg==='up'?-1/g.rows:0));this.save();this.render();return;}
       if(action==='submit'){
         const result=this.store.submit();
-        if(result==='correct'){this.feedback(true);if(await this.modal('拼图正确',this.story().quizEnabled?'接下来认识画中人物，也可以直接查看故事。':'欣赏完整图片和故事。',this.story().quizEnabled?'认一认人物':'查看故事'))this.go(state.current.phase);else this.go(state.current.phase);}
-        else{await this.modal(result==='incomplete'?'还没摆完':'再调整一下','对照原图继续摆放；当前位置已经保留。','继续拼图');this.render();}return;
+        if(result==='correct'){this.feedback(true);await this.modal('拼图正确',this.story().quizEnabled?(this.story().custom?'画面拼好了。接下来回答一道题。':'画面拼好了。接下来，认一认其中的人物。'):'欣赏图片，读一读它的故事。',this.story().quizEnabled?(this.story().custom?'回答问题':'认一认人物'):'查看故事','');this.go(state.current.phase);}
+        else{await this.modal(result==='incomplete'?'还没有摆放完整':'还需要再调整一下',result==='incomplete'?'还有碎片未放入画面，请继续拼图。':'拼图还有不一致的地方，可以对照原图继续调整。\n你的摆放已保留。',result==='incomplete'?'继续拼图':'继续调整','');this.render();}return;
       }
       if(action==='answer'){state.current.chosen=arg;state.current.result='';this.save();this.render();return;}
       if(action==='confirm'){if(!state.current.chosen)return;state.current.result=String(state.current.chosen).trim()===String(this.story().person).trim()?'correct':'wrong';this.save();this.render();return;}
@@ -120,7 +145,7 @@ Page({
       if(action==='next'){
         const s=this.story();
         if(s.custom){const set=state.sets.find(v=>v.id===s.setID),index=set?set.items.findIndex(i=>i.version===s.id):-1,next=index>=0?set.items[index+1]:null;if(next){this.storyID=next.version;this.setData({count:12,scene:''});this.go('prepare');}else this.go('mysets');}
-        else{const id=Number(this.storyID)+1;if(id<=Shared.stories.length){this.storyID=id;this.setData({count:12,scene:''});this.go('prepare');}else this.go('collection');}return;
+        else{const id=Number(this.storyID)+1;state.current=null;this.save();if(id<=Shared.stories.length){this.storyID=id;this.setData({count:12,scene:''});this.go('prepare');}else this.go('collection');}return;
       }
       if(action==='replay'){this.setData({count:12});this.go('prepare');return;}
       if(action==='filter'){this.setData({filter:arg});this.render();return;}
@@ -149,11 +174,13 @@ Page({
         for(const item of state.draft.items){const key=JSON.stringify([item.source,item.fit,Number(item.x),Number(item.y),Number(item.zoom)]);if(!item.image||item.sceneKey!==key)await Media.processScene(this,item);}
         const set=this.store.commit();this.setID=set.id;this.go('setdetail');return;
       }
-      if(action==='content'){await this.modal('内容说明','采用圣经人物故事的艺术化插画，故事为独立概述并标明出处。图片和个人创作仅保存本机。','知道了');return;}
+      if(action==='content'){await this.modal('内容说明','故事文字是独立概述，展示经文出处。逐字经文须先确定译本与使用条件。插画是艺术化表达，定稿前需核对情节。','我知道了','');return;}
+      if(action==='storage'){await this.modal('本地存档','图片、草稿、拼图进度和收藏仅保存到当前设备。没有账号或云端同步；清除小程序数据会失去本地内容。','我知道了','');return;}
+      if(action==='leave'){state.current=null;this.save();this.go('home');return;}
       if(action==='clear'){if(await this.modal('清除游玩进度？','已发现、收藏和未完成局将删除；个人图片集与草稿保留。','清除进度')){this.store.resetProgress();this.go('home');}return;}
-      if(action==='readAgain'){this.store=Store.createStore(wx);this.render();return;}
+      if(action==='readAgain'){this.store=Store.createStore(wx);this.setData({error:''});if(!this.store.state.current&&['puzzle','guess'].includes(this.screen))this.go('home');else this.render();return;}
       if(action==='resetStorage'){if(await this.modal('重置无法读取的资料？','将清除本机资料索引；原个人图片文件不删除。请先尝试重新读取。','重置')){this.store.recover();this.go('home');}return;}
-    }catch(e){this.fail(e);}finally{this.setData({busy:false});}
+    }catch(e){this.fail(e);}finally{if(!this.loadingPuzzle&&(this.screen!=='puzzle'||(this.renderer.ctx&&this.puzzleKey===state.current.storyID+':'+state.current.count)))this.setData({busy:false});}
   },
   async chooseFiles(){try{return await Media.invoke('chooseMedia',{count:9,mediaType:['image'],sourceType:['album'],sizeType:['original']});}catch(e){if((e.errMsg||'').includes('cancel'))return null;throw e;}},
   async importFile(file){
@@ -163,7 +190,9 @@ Page({
     if(info.width*info.height>40000000)throw Error('图片超过4000万像素。');
     // Decode and normalize EXIF orientation before saving the immutable source.
     const {node:canvas}=await Media.node(this,'#crop-cache'),img=await Media.image(canvas,file.tempFilePath);
-    const scale=Math.min(1,2560/Math.max(img.width,img.height));canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+    const scale=Math.min(1,2560/Math.max(img.width,img.height)),width=Math.round(img.width*scale),height=Math.round(img.height*scale);
+    await new Promise(resolve=>this.setData({cropWidth:width,cropHeight:height},resolve));
+    canvas.width=width;canvas.height=height;
     canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
     const out=await Media.invoke('canvasToTempFilePath',{canvas,fileType:'png',width:canvas.width,height:canvas.height,destWidth:canvas.width,destHeight:canvas.height});
     return {source:await Media.persistent(out.tempFilePath,'png'),width:info.width,height:info.height};
@@ -206,9 +235,10 @@ Page({
     const c=this.store.state.current;if(this.data.busy||!this.boardRect||!c||c.panMode)return;
     const t=this.point(e),x=t.clientX-this.boardRect.left,y=t.clientY-this.boardRect.top;
     const id=this.renderer.hit(x,y);
+    this.cancelDrag(false);
     this.drag={id,startX:t.clientX,startY:t.clientY,active:false,board:true};if(id!==null&&this.data.selected===null){this.setData({selected:id});this.renderer.draw();}
   },
-  trayStart(e){if(this.data.busy)return;const t=this.point(e);this.drag={id:Number(e.currentTarget.dataset.id),startX:t.clientX,startY:t.clientY,active:false,board:false};this.setData({selected:this.drag.id});},
+  trayStart(e){if(this.data.busy)return;const t=this.point(e);this.cancelDrag(false);this.drag={id:Number(e.currentTarget.dataset.id),startX:t.clientX,startY:t.clientY,active:false,board:false};this.setData({selected:this.drag.id});},
   trayLong(){if(this.drag)this.activateDrag();},
   activateDrag(){if(!this.drag||this.drag.id===null)return;this.drag.active=true;this.setData({dragging:true,selected:this.drag.id});this.renderer.draw();},
   touchMove(e){
@@ -223,14 +253,21 @@ Page({
     let changed=false;
     if(d.active){
       const x=t.clientX,y=t.clientY-24;
-      const inside=(r,a,b)=>r&&a>=r.left&&a<=r.right&&b>=r.top&&b<=r.bottom;
+      const inside=(r,a,b)=>{if(!r)return false;const right=r.right===undefined?r.left+r.width:r.right,bottom=r.bottom===undefined?r.top+r.height:r.bottom;return a>=r.left&&a<=right&&b>=r.top&&b<=bottom;};
       if(inside(this.boardRect,x,y)&&inside(this.boardView,x,y)){Shared.dropPiece(c,d.id,(x-this.boardRect.left)/this.boardRect.width,(y-this.boardRect.top)/this.boardRect.height);changed=true;}
       else if(inside(this.trayRect,t.clientX,t.clientY)){Shared.returnPiece(c,d.id);changed=true;}
     }else if(d.board&&this.data.selected!==null){Shared.dropPiece(c,this.data.selected,(t.clientX-this.boardRect.left)/this.boardRect.width,(t.clientY-this.boardRect.top)/this.boardRect.height);changed=true;}
-    this.cancelDrag();if(changed){this.save();this.feedback();this.render();}else this.renderer.draw();
+    if(changed&&d.active&&c.positions[d.id]){
+      const {cols,rows}=Shared.gridFor(c.count),cw=this.data.boardWidth/cols,ch=this.data.boardHeight/rows,slot=c.positions[d.id].slot;
+      this.drag=null;this.handoff={};
+      this.setData({dragging:false,ghost:{id:d.id,col:d.id%4,row:Math.floor(d.id/4),left:this.boardRect.left+(slot%cols)*cw-.22*cw,top:this.boardRect.top+Math.floor(slot/cols)*ch-.22*ch,width:cw*1.44,height:ch*1.44,settled:true}});
+    }else this.cancelDrag(false);
+    if(changed){this.save();this.feedback();this.render();}else this.renderer.draw();
   },
-  cancelDrag(){this.drag=null;this.setData({dragging:false,ghost:null});},
+  cancelDrag(redraw=true){const active=this.drag&&this.drag.active;this.drag=null;this.handoff=null;this.setData({dragging:false,ghost:null});if(active&&redraw)this.renderer.draw();},
   selectPiece(e){this.setData({selected:Number(e.currentTarget.dataset.id)});this.renderer.draw();},
+  boardFrameLoaded(e){this.renderer.frameReady(Number(e.currentTarget.dataset.buffer),e.currentTarget.dataset.src);},
+  boardFrameError(e){this.renderer.frameError(Number(e.currentTarget.dataset.buffer),e.currentTarget.dataset.src);},
   noop(){},
   imageError(){this.setData({error:'图片未能显示，请重试或重新选择图片。'});}
 });

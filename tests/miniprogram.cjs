@@ -41,4 +41,24 @@ check('Page can place selected pieces into occupied cells without correctness fe
  const p={...definition,data:clone(definition.data),store:createStore(api),storyID:1,screen:'puzzle',setData(update){Object.assign(this.data,update);},renderer:{draw(){},hit(){return 1;}},feedback(){},measure(){}};
  p.store.start(1,12);const c=p.store.state.current;Shared.dropPiece(c,1,.4,.1);p.data.selected=0;p.boardRect={left:0,top:0,width:400,height:300};p.boardStart({touches:[{clientX:150,clientY:50}]});p.touchEnd({changedTouches:[{clientX:150,clientY:50}]});assert.equal(c.positions[0].slot,1);assert(!c.positions[1]);assert.equal(c.submitResult,'');
 });
+check('Release keeps a snapped preview at the exact board coordinates until rendering catches up',()=>{
+ let definition;
+ vm.runInNewContext(fs.readFileSync(root+'/miniprogram/pages/index/index.js','utf8'),{require:p=>require(path.resolve(root+'/miniprogram/pages/index',p)),Page:p=>definition=p,wx:{setNavigationBarTitle(){},nextTick(){}},setTimeout,clearTimeout});
+ for(const count of [12,24,48]){
+  let draws=0;const updates=[];
+  const p={...definition,data:clone(definition.data),store:createStore(api),storyID:1,screen:'puzzle',setData(update){updates.push(update);Object.assign(this.data,update);},renderer:{draw(){draws++;}},feedback(){},measure(){}};
+  p.store.start(1,count);const c=p.store.state.current,{cols,rows}=Shared.gridFor(count),cw=335/cols,ch=251.25/rows;
+  p.boardRect={left:16.5,top:203.25,right:351.5,bottom:454.5,width:335,height:251.25};p.boardView=p.boardRect;
+  const start={clientX:100,clientY:550},end={clientX:16.5+cw*1.5,clientY:203.25+ch*1.5+24};
+  p.trayStart({currentTarget:{dataset:{id:0}},touches:[start]});p.trayLong();p.touchMove({touches:[end]});
+  updates.length=0;p.touchEnd({changedTouches:[end]});
+  assert.equal(c.positions[0].slot,cols+1);assert.equal(p.drag,null);assert(p.handoff);
+  assert(p.data.ghost&&p.data.ghost.settled,'Released piece must remain visible while the board image is pending');
+  assert(Math.abs(p.data.ghost.left+p.data.ghost.width*22/144-(16.5+cw))<1e-9);
+  assert(Math.abs(p.data.ghost.top+p.data.ghost.height*22/144-(203.25+ch))<1e-9);
+  assert(!updates.some(update=>Object.hasOwn(update,'ghost')&&update.ghost===null),'No empty preview between release and the board handoff');
+  const placed=JSON.stringify(c.positions);p.cancelDrag();assert.equal(p.data.ghost,null);assert.equal(p.handoff,null);assert.equal(JSON.stringify(c.positions),placed);
+  p.drag={id:0,active:true,board:true};p.data.ghost={id:0};const before=draws;p.cancelDrag();assert.equal(draws,before+1,'Cancelling a lifted board piece restores its original image');
+ }
+});
 console.log(JSON.stringify({checks,errors:[]},null,2));

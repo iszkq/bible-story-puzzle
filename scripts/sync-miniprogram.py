@@ -29,6 +29,7 @@ config=json.loads((mini/'app.json').read_text(encoding='utf-8'))
 config['subpackages']=[dict(name=p.name,root=p.name,pages=['loader/index']) for p in packages]
 (mini/'app.json').write_text(json.dumps(config,ensure_ascii=False,indent=2),encoding='utf-8')
 for package in packages:
+    (package/'resources.js').write_text("'use strict';\nmodule.exports={ready:true};\n",encoding='utf-8')
     size=sum(f.stat().st_size for f in package.rglob('*') if f.is_file())
     assert size<2*1024*1024, f'{package.name} exceeds 2 MiB'
     print(package.name,round(size/1024),'KiB')
