@@ -1,0 +1,100 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "拾光拼图册",
+    "navigationBarBackgroundColor": "@navBg",
+    "navigationBarTextStyle": "@navText",
+    "backgroundColor": "@bg"
+  },
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "style": "v2",
+  "subpackages": [
+    {
+      "name": "artworks-a",
+      "root": "artworks-a",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-b",
+      "root": "artworks-b",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-c",
+      "root": "artworks-c",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-d",
+      "root": "artworks-d",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-e",
+      "root": "artworks-e",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-f",
+      "root": "artworks-f",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-g",
+      "root": "artworks-g",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-h",
+      "root": "artworks-h",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-i",
+      "root": "artworks-i",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-j",
+      "root": "artworks-j",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-k",
+      "root": "artworks-k",
+      "pages": [
+        "loader/index"
+      ]
+    },
+    {
+      "name": "artworks-l",
+      "root": "artworks-l",
+      "pages": [
+        "loader/index"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "description": "拾光拼图册 · 与iOS保持画册界面与拼图规则",
+  "compileType": "game",
+  "miniprogramRoot": "./",
+  "appid": "touristappid",
+  "projectname": "拾光拼图册",
+  "setting": {
+    "es6": true,
+    "minified": true,
+    "urlCheck": true
+  }
+}

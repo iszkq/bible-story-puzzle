@@ -11,9 +11,10 @@ assert len(ids)==len(set(ids)), 'Duplicate PBX object'
 for ref in scheme.findall('.//BuildableReference'): assert ref.attrib['BlueprintIdentifier'] in ids
 for name in ['App.swift','LocalAssetServer.swift','PuzzleViewController.swift','Info.plist','PrivacyInfo.xcprivacy','place.wav','complete.wav']:
     assert (app/name).is_file(), 'Missing '+name
-for name in ['index.html','native.js','mobile.css','故事集.js']:
+for name in ['index.html','shared.js','native.js','mobile.css','故事集.js']:
     assert (app/'Web'/name).read_bytes()==(root/'web'/name).read_bytes(), 'Stale packaged '+name
-for name in ['moses','noah','david','ruth','daniel','esther','welcome']: assert (app/'Web/assets'/f'{name}.jpg').is_file()
+scene_names=json.loads(re.search(r'const sceneNames=(\[[^;]+\]);',(root/'web/shared.js').read_text(encoding='utf-8')).group(1))
+for name in scene_names+['welcome']: assert (app/'Web/assets'/f'{name}.jpg').read_bytes()==(root/'web/assets'/f'{name}.jpg').read_bytes()
 assert not (app/'Web/assets/originals').exists(), 'App should omit large source masters'
 icons=json.loads((app/'Assets.xcassets/AppIcon.appiconset/Contents.json').read_text())
 for icon in icons['images']: assert (app/'Assets.xcassets/AppIcon.appiconset'/icon['filename']).is_file()

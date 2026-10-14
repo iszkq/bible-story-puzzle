@@ -1,0 +1,54 @@
+{
+  "deviceOrientation": "portrait",
+  "showStatusBar": false,
+  "subpackages": [
+    {
+      "name": "artworks-a",
+      "root": "artworks-a/"
+    },
+    {
+      "name": "artworks-b",
+      "root": "artworks-b/"
+    },
+    {
+      "name": "artworks-c",
+      "root": "artworks-c/"
+    },
+    {
+      "name": "artworks-d",
+      "root": "artworks-d/"
+    },
+    {
+      "name": "artworks-e",
+      "root": "artworks-e/"
+    },
+    {
+      "name": "artworks-f",
+      "root": "artworks-f/"
+    },
+    {
+      "name": "artworks-g",
+      "root": "artworks-g/"
+    },
+    {
+      "name": "artworks-h",
+      "root": "artworks-h/"
+    },
+    {
+      "name": "artworks-i",
+      "root": "artworks-i/"
+    },
+    {
+      "name": "artworks-j",
+      "root": "artworks-j/"
+    },
+    {
+      "name": "artworks-k",
+      "root": "artworks-k/"
+    },
+    {
+      "name": "artworks-l",
+      "root": "artworks-l/"
+    }
+  ]
+}

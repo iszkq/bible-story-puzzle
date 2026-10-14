@@ -12,3 +12,7 @@ ios/BibleStoryPuzzle.xcodeproj/xcuserdata/
 *.mobileprovision
 *.p12
 .env*
+work/
+outputs/
+__pycache__/
+project.private.config.json

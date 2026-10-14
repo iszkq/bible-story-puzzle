@@ -1,10 +1,14 @@
-# 拼见圣经 · Bible Story Puzzle
+# 拾光拼图册
+
+用户选定名称统一用于iOS、微信小游戏和普通小程序。当前采用**普通小程序版**，开发者工具导入本项目根目录，见 [小程序导入说明](docs/微信小程序交付与导入.md)。小游戏旧适配目录保留供参考。
+
+# 项目说明
 
 一个面向成人的离线 iOS 故事拼图。玩家可以查看完整原图，把乱序碎片拖到按难度划分的网格中；所有格子都以同样方式吸附，摆放时不提示对错，只有主动提交时才给出整体结果。通过后可以回答人物问题、阅读故事并收藏。
 
 项目也支持“我的故事集”：批量导入 JPEG、PNG 或 WebP，裁切为 4:3 或用中性边框保留完整画面，编辑标题／故事／出处／可选三选一问题，排序、选封面，试玩 12／24／48 块并保存草稿。内容、图片版本、进度和收藏都只在当前设备保存，不上传服务器。
 
-下载：[v0.5.0 未签名 iOS IPA](https://github.com/iszkq/bible-story-puzzle/releases/tag/v0.5.0)。最低 iOS 16，iPhone 竖屏；安装到普通 iPhone 前需签名。已通过 125 项网页检查和 2 项 iPhone 模拟器 UI 检查，详见 `docs/iOS实现与构建状态.md`。
+当前源码版本为 **0.6.0（iOS build 2）**，内置24幅故事图。推送后在 [GitHub Actions](https://github.com/iszkq/bible-story-puzzle/actions/workflows/build-ios.yml) 查看本次结果，成功时下载 `BibleStoryPuzzle-unsigned-ipa` 产物。最低 iOS 16，iPhone 竖屏；未签名 IPA 安装前需签名。此前 [v0.5.0](https://github.com/iszkq/bible-story-puzzle/releases/tag/v0.5.0) 的构建记录见 `docs/iOS实现与构建状态.md`。
 
 ## 目录
 
@@ -42,6 +46,13 @@ GitHub Actions 使用同样的命令，在 macOS runner 上归档 `BibleStoryPuz
 
 仓库：[github.com/iszkq/bible-story-puzzle](https://github.com/iszkq/bible-story-puzzle)
 
-显示名：**拼见圣经**；英文名：**Bible Story Puzzle**。初始六幅故事图、欢迎图和图标来自用户提供的素材；本仓库没有调用 API 生成新图片。详见 `docs/素材需求与精美制作流程.md` 与 `web/assets/asset-manifest.json`。
+显示名：**拾光拼图册**；英文名：**Bible Story Puzzle**。现有24幅故事图、欢迎图和图标来自用户提供的素材；本仓库没有调用 API 生成新图片。详见 `docs/素材需求与精美制作流程.md` 与 `web/assets/asset-manifest.json`。
 
 原生应用只允许访问自己的 `127.0.0.1:18765` 资源服务和用户主动选择的图片。没有账号、广告、分析、云同步或远程图片上传。删除 App 或清除网站数据会删除本地故事集与进度。
+# 微信小程序新增版本 · 2026-10-14
+
+小程序名称“拾光拼图册”（未核验注册），共24张官方拼图。iOS工程继续保留，场景与玩法由 `web/shared.js` 共享；两端存档各在本机。
+
+微信开发者工具导入本目录，读取 `project.config.json`。当前为本地试用 AppID；正式预览和发布需要自己的AppID。完整说明见 [微信小程序交付与导入](docs/微信小程序交付与导入.md) 与 [新增图片检查与命名](docs/新增图片检查与命名.md)。
+
+已通过共用网页回归、小程序存储与玩法测试、微信WXML/WXSS编译及包体检查。微信模拟器和真机尚未验证；iOS本次构建结果以对应提交的Actions记录为准。微信上传、审核与发布见 [微信版本上传与发布](docs/微信版本上传与发布.md)。

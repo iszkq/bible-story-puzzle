@@ -1,13 +1,15 @@
 {
-  "version": 7,
-  "updated_at": "2026-10-13",
+  "version": 11,
+  "updated_at": "2026-10-14",
   "system_origin": "greenfield",
   "product": {
-    "name": "拼见圣经（暂名）",
+    "name": "拾光拼图册",
     "category": "圣经故事拼图与人物识别",
     "audience": "主要成人，用户明确选择",
     "platforms": [
-      "iOS iPhone；iPad为可选适配"
+      "iOS iPhone；iPad为可选适配",
+      "微信小程序（新增独立容器，保留iOS）",
+      "微信小游戏（独立Canvas容器）"
     ],
     "primary_workflows": [
       "选故事→预览→自由拖动拼图→提交→整体校验→识别人物→揭晓故事→收藏",
@@ -286,7 +288,6 @@
     "when_to_add_new_components": "new workflow or reusable behavior needs a defined state and accessibility contract"
   },
   "open_questions": [
-    "final name",
     "Bible translation",
     "minimum iOS",
     "monetization",
@@ -298,9 +299,9 @@
     "status": "user_supplied_assets_integrated",
     "user_choice": "用户选择等内置生图工具可用后再生成；不使用API备用方式",
     "generated_assets": 0,
-    "integrated_assets": 8,
+    "integrated_assets": 26,
     "prompt_file": "素材生成提示集.md",
-    "supplied_assets": 8
+    "supplied_assets": 26
   },
   "implementation": {
     "architecture": "SwiftUI host + WKWebView shared game",
@@ -309,6 +310,24 @@
     "native_import": "PHPicker and UIDocumentPicker; selected files only",
     "signing": "unsigned device build in macOS GitHub Actions",
     "trial_backup": "persistent localStorage backup restored on WebView rebuild or cold launch",
-    "text_size": "native Dynamic Type scale for reading, headings, questions and form input"
+    "text_size": "native Dynamic Type scale for reading, headings, questions and form input",
+    "miniprogram": {
+      "entry": "miniprogram/pages/index/index",
+      "shared": "web/shared.js → miniprogram/shared.js",
+      "rendering": "WXML/WXSS + Canvas 2D, complementary masks",
+      "storage": "wx storage + persistent local files; no upload",
+      "name": "拾光拼图册（用户选定，注册状态未核验）",
+      "sync": "same gameplay and scene data; independent local user state",
+      "layout": "匹配iOS：欢迎、主图首页、篇章列表、全宽4:3棋盘、四行滚动托盘、留边52px提交按钮、底部标签；方向微调在面板中"
+    },
+    "minigame": {
+      "entry": "minigame-project/game.js",
+      "contract": "docs/微信小游戏设计与交付.md",
+      "shared": "web/shared.js → minigame-project/shared.js",
+      "name": "拾光拼图册（用户选定，注册状态未核验）",
+      "storage": "独立wx存档和本机图片，不上传",
+      "tray": "与iOS相同：四列四行滚动托盘，完整4:3棋盘"
+    },
+    "preferred_wechat_container": "miniprogram"
   }
 }

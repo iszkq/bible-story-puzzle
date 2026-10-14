@@ -1,8 +1,12 @@
-# iOS 实现与构建状态 · v0.5
+# iOS 实现与构建状态
+
+当前源码为 v0.6.0 / build 2，显示名“拾光拼图册”，离线内置24幅故事图与缩略图。IPA检查会验证版本、显示名、全部素材和共享玩法文件。此次实际编译与模拟器测试结果见 GitHub Actions 对应提交；以下 v0.5 内容为此前验证记录，不代表 v0.6 已通过。
+
+## v0.5 历史记录
 
 仓库地址：https://github.com/iszkq/bible-story-puzzle
 
-应用显示名《拼见圣经》，英文名 Bible Story Puzzle，Bundle ID `com.iszkq.biblestorypuzzle`，最低 iOS 16.0；首版 iPhone 竖屏。工程采用 SwiftUI 容器和 WKWebView 共享游戏逻辑，并非所有页面重写为 SwiftUI。
+应用显示名《拾光拼图册》，英文名 Bible Story Puzzle，Bundle ID `com.iszkq.biblestorypuzzle`，最低 iOS 16.0；首版 iPhone 竖屏。工程采用 SwiftUI 容器和 WKWebView 共享游戏逻辑，并非所有页面重写为 SwiftUI。
 
 ## 已实现
 

@@ -1,0 +1,43 @@
+/* Shared by WKWebView and WeChat. Generated copies must stay byte-identical. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.PuzzleShared=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+'use strict';
+const stories=[
+ {id:1,person:'摩西',title:'海中的道路',ref:'出埃及记14:15–31',clue:'再观察一下他手中的手杖和两侧的海水。',question:'画面中拿着手杖、带领人群的人是谁？',options:['约书亚','摩西','亚伦'],summary:'以色列人来到海边，前方是海水，后方有追兵。摩西按照上帝的吩咐向海伸杖，海水分开，百姓走在干地上经过。他们在艰难处境中经历了出路。画面以手杖、两侧海水和行进的人群作为识别线索。'},
+ {id:2,person:'挪亚',title:'归来的鸽子',ref:'创世记8:6–12',clue:'留意方舟和归来的鸽子。',question:'方舟旁接回鸽子的人是谁？',options:['亚伯拉罕','挪亚','雅各'],summary:'洪水之后，挪亚从方舟里放出鸽子，观察地面的变化。鸽子后来带回新拧下来的橄榄叶，成为画面中的重要线索。'},
+ {id:3,person:'大卫',title:'少年与巨人',ref:'撒母耳记上17章',clue:'留意少年手中的投石索。',question:'手持投石索的少年是谁？',options:['大卫','扫罗','撒母耳'],summary:'大卫面对体型高大的歌利亚，没有使用王的盔甲，而是带着牧人的器具迎上前去。少年与巨人的体型差和投石索，是这个故事的画面线索。'},
+ {id:4,person:'路得',title:'麦田里的拾穗者',ref:'路得记2章',clue:'观察她在田间拾取麦穗的动作。',question:'在这段故事中，田间拾穗的人是谁？',options:['以斯帖','路得','米利暗'],summary:'路得来到田间，跟在收割的人后面拾取麦穗。她在波阿斯的田里得到帮助。画面以麦田与拾穗动作呈现这个故事。'},
+ {id:5,person:'但以理',title:'狮子之间',ref:'但以理书6章',clue:'观察人物周围的狮子和洞穴。',question:'狮子之间的主要人物是谁？',options:['约拿','以利亚','但以理'],summary:'但以理因坚持祷告被投入狮子坑。他在其中得到保守，后来从坑中被带出来。画面以洞穴、狮子和人物平静的姿态作为线索。'},
+ {id:6,person:'以斯帖',title:'王宫中的请求',ref:'以斯帖记5:1–3',clue:'观察王后、王宫和伸出的金杖。',question:'来到王面前提出请求的王后是谁？',options:['路得','以斯帖','底波拉'],summary:'以斯帖穿上朝服，来到王宫内院。王看见她，向她伸出金杖，她便上前触摸杖头。画面以王宫、王后和金杖呈现这段情节。'},
+{"id": 7, "person": "亚伯拉罕", "title": "帐篷外的星空", "ref": "创世记15:1–6", "clue": "留意帐篷与星空。", "question": "仰望星空的主要人物是谁？", "options": ["亚伯拉罕", "以撒", "雅各"], "summary": "亚伯拉罕来到帐篷外。上帝让他仰望天空、数算众星，并以众星比喻所应许的后裔。画面以帐篷、夜空和仰望的姿态呈现这段故事。"},
+{"id": 8, "person": "约瑟", "title": "粮仓里的安排", "ref": "创世记41:46–49", "clue": "留意粮仓、谷物与管理者。", "question": "安排储粮的主要人物是谁？", "options": ["摩西", "约瑟", "但以理"], "summary": "约瑟在埃及管理粮食，在丰收的七年里把各地的粮食收存起来。画面以储藏建筑、谷物和搬运粮食的劳动者呈现这项工作。"},
+{"id": 9, "person": "雅各", "title": "井边的相遇", "ref": "创世记29:9–12", "clue": "留意井旁滚开的石头和羊群。", "question": "给羊群饮水的青年是谁？", "options": ["雅各", "以撒", "大卫"], "summary": "拉结带着羊群来到井边。雅各滚开井口的石头，为羊群饮水。画面以石井、水槽、羊群和两人的相遇呈现这一时刻。"},
+{"id": 10, "person": "利百加", "title": "井旁的水罐", "ref": "创世记24:15–20", "clue": "留意陶水罐、石槽与骆驼。", "question": "在井旁为骆驼取水的人是谁？", "options": ["拉结", "路得", "利百加"], "summary": "利百加来到井边取水。她不仅给远道而来的仆人喝水，也主动为他的骆驼打水。画面以水罐、水槽和骆驼作为线索。"},
+{"id": 11, "person": "米利暗", "title": "海岸上的鼓声", "ref": "出埃及记15:20–21", "clue": "留意岸边的框鼓与庆祝人群。", "question": "带领妇女击鼓庆祝的人是谁？", "options": ["米利暗", "底波拉", "以斯帖"], "summary": "百姓过海之后，米利暗拿着鼓，妇女们跟随她击鼓跳舞。画面选择岸边庆祝的时刻，以手鼓、海岸和人群作为线索。"},
+{"id": 12, "person": "约书亚", "title": "河岸上的石头", "ref": "约书亚记4:1–9、19–24", "clue": "留意河岸、营地与纪念石头。", "question": "指导安放纪念石头的领袖是谁？", "options": ["摩西", "约书亚", "基甸"], "summary": "百姓渡过约旦河之后，按吩咐取来十二块石头，作为渡河的纪念。约书亚后来把石头立在吉甲。画面以河岸和纪念石堆表现这段故事，并非精确的考古复原。"},
+{"id": 13, "person": "基甸", "title": "山坡上的火把", "ref": "士师记7:16–20", "clue": "留意火把、号角和破开的陶罐。", "question": "带领同伴举火把、吹角的人是谁？", "options": ["基甸", "大卫", "扫罗"], "summary": "基甸把号角、空瓶和火把交给同伴。在夜间行动时，他们吹角、打破瓶子并举起火把。画面选择行动开始的时刻，不表现近距离战斗。"},
+{"id": 14, "person": "撒母耳", "title": "灯还亮着", "ref": "撒母耳记上3:1–10", "clue": "留意少年、夜间灯光与门口的以利。", "question": "夜里听见呼唤后起身的少年是谁？", "options": ["撒母耳", "约瑟", "大卫"], "summary": "年少的撒母耳夜里听见呼唤，数次起身去见以利。以利后来明白是上帝呼唤他，并教他如何回应。画面以少年、安静的室内和仍亮着的灯作为线索。"},
+{"id": 15, "person": "所罗门", "title": "新建的殿宇", "ref": "列王纪上6章、7:13–22", "clue": "留意殿宇入口、铜柱与工匠。", "question": "主持建造圣殿的君王是谁？", "options": ["大卫", "所罗门", "希西家"], "summary": "所罗门建造圣殿，并安排殿内外的器物与装饰。画面以殿宇入口、铜柱和工匠作为线索，是艺术化历史重构，不代表经文记载的某个具体巡视时刻。"},
+{"id": 16, "person": "以利亚", "title": "溪边的来客", "ref": "列王纪上17:2–6", "clue": "留意溪水、乌鸦与食物。", "question": "在溪旁由乌鸦送来食物的人是谁？", "options": ["以利沙", "约拿", "以利亚"], "summary": "以利亚按吩咐住在基立溪旁，从溪里喝水，乌鸦早晚给他送来食物。画面以溪水、岩石和乌鸦作为线索。"},
+{"id": 17, "person": "以利沙", "title": "锅旁的一把面", "ref": "列王纪下4:38–41", "clue": "留意汤锅和撒入的面。", "question": "把面撒进汤锅的人是谁？", "options": ["以利沙", "以利亚", "撒母耳"], "summary": "饥荒期间，先知门徒煮了一锅汤，后来发现锅里有问题。以利沙叫人拿面来，撒在锅里，随后让众人继续食用。画面以面、锅和聚集的人群呈现这段故事。"},
+{"id": 18, "person": "约拿", "title": "海边的归途", "ref": "约拿书2:10", "clue": "留意海岸与远处离岸的大鱼。", "question": "被大鱼放到旱地的人是谁？", "options": ["彼得", "挪亚", "约拿"], "summary": "大鱼按吩咐把约拿吐在旱地上。画面选择约拿已经站稳、回望海面的时刻，以海岸和离岸的大鱼呈现他重新出发的转折。"},
+{"id": 19, "person": "耶稣", "title": "草地上的分享", "ref": "约翰福音6:1–13", "clue": "留意饼、鱼与草地上接受食物的人群。", "question": "把饼分给众人的主要人物是谁？", "options": ["彼得", "耶稣", "施洗约翰"], "summary": "众人来到耶稣身边，一名少年带着五个饼和两条鱼。耶稣祝谢后把食物分给众人，大家吃饱，门徒还收拾了剩下的食物。画面以分享食物的动作和草地上的人群作为线索。"},
+{"id": 20, "person": "彼得", "title": "满网的清晨", "ref": "路加福音5:1–11", "clue": "留意满网的鱼、木船与协作的渔夫。", "question": "在船上拉起鱼网的主要渔夫是谁？", "options": ["彼得", "保罗", "雅各"], "summary": "西门彼得按耶稣的话下网，捕到了许多鱼，便招呼同伴来帮忙。画面以满网的鱼、木船和共同拉网的动作呈现这段故事。"},
+{"id": 21, "person": "施洗约翰", "title": "河边的人群", "ref": "马太福音3:1–6", "clue": "留意粗毛衣服、皮带与河岸人群。", "question": "在约旦河边向人群讲话的人是谁？", "options": ["使徒约翰", "以利亚", "施洗约翰"], "summary": "施洗约翰在旷野传道，人们来到约旦河边听他讲话，并接受洗礼。画面以粗毛衣服、皮带、河水和聚集的人群作为线索。"},
+{"id": 22, "person": "马利亚", "title": "马槽旁的夜晚", "ref": "路加福音2:6–7", "clue": "留意襁褓、马槽与照看婴儿的母亲。", "question": "在马槽旁照看婴儿的母亲是谁？", "options": ["马利亚", "利百加", "马大"], "summary": "马利亚生下耶稣，用布包裹起来，放在马槽里，因为客店里没有地方。画面以母亲、襁褓和简朴的马槽呈现这个夜晚。"},
+{"id": 23, "person": "马大", "title": "家中的晚餐", "ref": "约翰福音12:1–3", "clue": "留意端送食物的动作与家中晚餐。", "question": "在伯大尼晚餐中服事的人是谁？", "options": ["路得", "马大", "马利亚"], "summary": "在伯大尼，人们为耶稣预备晚餐，马大服事，拉撒路也一同坐席。画面突出马大端送食物的动作，同时保留其他人在场的线索。"},
+{"id": 24, "person": "保罗", "title": "作坊里的帐篷", "ref": "使徒行传18:1–3", "clue": "留意针线、厚布与共同工作的三人。", "question": "与亚居拉、百基拉制作帐篷的人是谁？", "options": ["彼得", "保罗", "巴拿巴"], "summary": "保罗来到哥林多，遇见亚居拉和百基拉。他们以制造帐篷为业，保罗因与他们同业，就住在一起工作。画面以厚布、针线和作坊作为线索。"}
+];
+const sceneNames=["moses", "noah", "david", "ruth", "daniel", "esther", "abraham", "joseph", "jacob", "rebekah", "miriam", "joshua", "gideon", "samuel", "solomon", "elijah", "elisha", "jonah", "jesus", "peter", "john-baptist", "mary", "martha", "paul"];
+const difficulties=[12,24,48];
+const gridFor=n=>n===48?{cols:8,rows:6}:n===24?{cols:6,rows:4}:{cols:4,rows:3};
+function shuffledPieces(n,random=Math.random){const ids=Array.from({length:n},(_,i)=>i);for(let i=n-1;i>0;i--){const j=Math.floor(random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}return ids;}
+function createGame(storyID,count){if(!difficulties.includes(count))throw Error('Unsupported difficulty');return {storyID,count,placed:[],trayOrder:shuffledPieces(count),positions:{},layer:0,trayScroll:0,zoom:false,panMode:false,panX:0,panY:0,phase:'puzzle',chosen:null,result:'',submitResult:'',submitAttempts:0};}
+function syncPlaced(c){c.placed=Object.keys(c.positions).map(Number).sort((a,b)=>c.positions[a].z-c.positions[b].z);}
+function dropPiece(c,id,x,y){if(!Number.isInteger(id)||id<0||id>=c.count||!Number.isFinite(x)||!Number.isFinite(y))return;const {cols,rows}=gridFor(c.count);const col=Math.max(0,Math.min(cols-1,Math.floor(x*cols))),row=Math.max(0,Math.min(rows-1,Math.floor(y*rows))),slot=row*cols+col,old=c.positions[id];const occupant=Object.keys(c.positions).find(other=>Number(other)!==id&&c.positions[other].slot===slot);if(occupant!==undefined){if(old)c.positions[occupant]={...old,z:++c.layer};else delete c.positions[occupant];}c.positions[id]={slot,x:(col+.5)/cols,y:(row+.5)/rows,z:++c.layer};c.submitResult='';syncPlaced(c);}
+function returnPiece(c,id){delete c.positions[id];c.submitResult='';syncPlaced(c);}
+function checkPuzzle(c){if(Object.keys(c.positions).length!==c.count)return 'incomplete';return Array.from({length:c.count},(_,id)=>c.positions[id]&&c.positions[id].slot===id).every(Boolean)?'correct':'incorrect';}
+function pieceCommands(id,n){const {cols,rows}=gridFor(n),col=id%cols,row=Math.floor(id/cols);const out=[['M',0,0]];const p=(x,y,dx,dy,nx,ny,t,h)=>[x+dx*t+nx*h,y+dy*t+ny*h];function edge(x,y,dx,dy,nx,ny,sign){const at=(t,h)=>p(x,y,dx,dy,nx,ny,t,h);if(!sign){out.push(['L',...at(1,0)]);return;}out.push(['L',...at(.32,0)],['C',...at(.4,0),...at(.32,18*sign),...at(.5,18*sign)],['C',...at(.68,18*sign),...at(.6,0),...at(.68,0)],['L',...at(1,0)]);}const h=(r,c)=>(r*13+c*7)%2?1:-1,v=(r,c)=>(r*11+c*3)%2?1:-1;edge(0,0,100,0,0,-1,row?h(row,col):0);edge(100,0,0,100,1,0,col<cols-1?v(row,col+1):0);edge(100,100,-100,0,0,1,row<rows-1?-h(row+1,col):0);edge(0,100,0,-100,-1,0,col?-v(row,col):0);out.push(['Z']);return out;}
+function piecePath(id,n){return pieceCommands(id,n).map(c=>c.join(' ')).join(' ');}
+function drawPath(ctx,id,n){ctx.beginPath();for(const c of pieceCommands(id,n)){if(c[0]==='M')ctx.moveTo(c[1],c[2]);else if(c[0]==='L')ctx.lineTo(c[1],c[2]);else if(c[0]==='C')ctx.bezierCurveTo(...c.slice(1));else ctx.closePath();}}
+return {stories,sceneNames,difficulties,gridFor,shuffledPieces,createGame,dropPiece,returnPiece,checkPuzzle,piecePath,pieceCommands,drawPath};
+});

@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;overflow:hidden}canvas{touch-action:none}</style></head><body>
+<script>
+const mods={},files={},callbacks={},events={};let serial=0,canvasCount=0,saveFails=false,chosen=[];
+const emit=(name,event)=>{if(events[name])events[name](event);};
+const wx={
+env:{USER_DATA_PATH:'wxfile://user'},
+getSystemInfoSync:()=>({windowWidth:innerWidth,windowHeight:innerHeight,pixelRatio:devicePixelRatio,theme:'light',safeArea:{top:0,bottom:innerHeight-20}}),
+getWindowInfo(){return this.getSystemInfoSync();},getMenuButtonBoundingClientRect:()=>({bottom:40}),
+createCanvas(){const c=document.createElement('canvas');if(canvasCount++===0){c.style.width='100vw';c.style.height='100vh';document.body.append(c);}c.toTempFilePath=o=>{const path='temp-'+(++serial);files[path]=c.toDataURL('image/jpeg',o.quality);o.success({tempFilePath:path});};return c;},
+createImage(){const img=new Image();const set=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src').set;Object.defineProperty(img,'src',{set(path){set.call(img,files[path]||('/minigame-project/'+path));}});return img;},
+getStorageSync:key=>{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):undefined;},
+setStorageSync(key,value){if(saveFails)throw Error('quota');localStorage.setItem(key,JSON.stringify(value));},
+getFileSystemManager:()=>({copyFile(o){files[o.destPath]=files[o.srcPath]||('/minigame-project/'+o.srcPath);o.success({});}}),
+loadSubpackage:o=>o.success({}),showModal:o=>o.success({confirm:true}),
+chooseImage:o=>o.success({tempFilePaths:chosen}),
+showKeyboard:o=>{callbacks.keyboard=o;},hideKeyboard(){},
+vibrateShort(){},
+onTouchStart:fn=>events.start=fn,onTouchMove:fn=>events.move=fn,onTouchEnd:fn=>events.end=fn,onTouchCancel:fn=>events.cancel=fn,
+onKeyboardConfirm:fn=>events.keyboardConfirm=fn,onKeyboardComplete:fn=>events.keyboardComplete=fn,
+onHide:fn=>events.hide=fn,onShow:fn=>events.show=fn,onWindowResize:fn=>events.resize=fn,onThemeChange:fn=>events.theme=fn,
+};
+window.wx=wx;window.require=name=>mods[name.replace('./','')];window.module={exports:{}};
+addEventListener('mousedown',e=>emit('start',{touches:[{clientX:e.clientX,clientY:e.clientY}]}));
+addEventListener('mousemove',e=>{if(e.buttons)emit('move',{touches:[{clientX:e.clientX,clientY:e.clientY}]});});
+addEventListener('mouseup',e=>emit('end',{changedTouches:[{clientX:e.clientX,clientY:e.clientY}]}));
+addEventListener('resize',()=>emit('resize',{}));
+window.testInput=value=>emit('keyboardConfirm',{value});
+window.testPhoto=()=>{const c=document.createElement('canvas');c.width=600;c.height=900;const x=c.getContext('2d');x.fillStyle='#efb260';x.fillRect(0,0,600,900);x.fillStyle='#394f8a';x.fillRect(0,450,600,450);files.photo=c.toDataURL('image/png');chosen=['photo'];};
+</script>
+<script>
+(async()=>{for(const name of ['shared','store','media','engine']){const source=await(await fetch('/minigame-project/'+name+'.js')).text(),m={exports:{}};new Function('require','module','exports',source)(window.require,m,m.exports);mods[name]=m.exports;}window.app=mods.engine.createApp(wx);})();
+</script>
+</body></html>

@@ -1,0 +1,189 @@
+<view class="page {{root ? 'has-tabs' : ''}} {{screen === 'puzzle' ? 'puzzle-page' : ''}}">
+  <view wx:if="{{error}}" class="error" role="alert">
+    <text>{{error}}</text>
+    <button wx:if="{{!blocked}}" class="link" bindtap="act" data-action="retry">重试</button>
+    <block wx:else><button bindtap="act" data-action="readAgain">重新读取</button><button class="danger" bindtap="act" data-action="resetStorage">重置资料</button></block>
+  </view>
+  <view wx:if="{{busy}}" class="loading" role="status">正在处理，请稍候…</view>
+
+  <block wx:if="{{screen === 'welcome'}}">
+    <text class="eyebrow">拾光拼图册</text>
+    <image class="art" src="/assets/welcome.jpg" mode="aspectFit" binderror="imageError" />
+    <text class="display">{{'拼出画面，\n发现故事。'}}</text>
+    <text class="muted paragraph">对照原图摆放碎片，拼完后认识画中人物，把喜欢的故事收进画册。</text>
+    <button class="primary" bindtap="act" data-action="first">开始第一个故事</button>
+    <button class="link" bindtap="act" data-action="go" data-arg="home">浏览画册</button>
+    <text class="caption muted paragraph">无需登录。可随时查看原图，摆放完成后主动提交。</text>
+  </block>
+
+  <block wx:elif="{{screen === 'home'}}">
+    <view class="bar with-actions"><view class="brand"><image class="app-mark" src="/assets/icon.png" mode="aspectFit"/><text>拾光拼图册</text></view><button class="nav-link" bindtap="act" data-action="go" data-arg="settings">设置</button></view>
+    <text class="display">今天，拼一个故事。</text>
+    <image class="art" src="{{homeScene || shown.thumb}}" mode="aspectFit" binderror="imageError"/>
+    <view class="row"><text class="heading">{{shown.label}}</text><text class="caption muted">{{current ? placed + '/' + current.count + '块' : '12块起'}}</text></view>
+    <text class="caption muted paragraph">{{current ? '进度已保存，随时继续。' : '从画面中的线索，认识一个人物。'}}</text>
+    <button class="primary" bindtap="act" data-action="resume">{{current ? (current.phase === 'puzzle' ? '继续拼图' : current.phase === 'guess' ? '继续认人物' : '查看上次故事') : '开始下一个故事'}}</button>
+    <view class="section row"><text class="section-heading">故事篇章</text><button class="link" bindtap="act" data-action="go" data-arg="list">查看全部</button></view>
+    <button class="chapter" bindtap="act" data-action="go" data-arg="list"><view><text>第一辑 · 发现与旅程</text><text class="caption muted">已完成{{officialCompleted}}/{{official.length}}个故事</text></view><text>›</text></button>
+  </block>
+
+  <block wx:elif="{{screen === 'list'}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="go" data-arg="home">返回</button><text>发现与旅程</text></view>
+    <text class="title">发现与旅程</text>
+    <text class="muted paragraph">{{official.length}}个画面，{{official.length}}个故事。拼完一幅，开启下一幅。</text>
+    <text class="caption muted paragraph">已完成{{officialCompleted}}/{{official.length}} · 答错也可以查看故事</text>
+    <button wx:for="{{official}}" wx:key="id" class="story-row" aria-disabled="{{item.locked}}" bindtap="act" data-action="choose" data-arg="{{item.id}}">
+      <image class="row-art" src="{{item.thumb}}" mode="aspectFit" binderror="imageError"/>
+      <view class="row-copy"><text class="heading">{{item.label}}</text><text class="caption muted">{{item.status}}</text></view><text>{{item.locked ? '锁定' : '›'}}</text>
+    </button>
+  </block>
+
+  <block wx:elif="{{screen === 'prepare'}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="go" data-arg="{{story.custom ? 'setdetail' : 'list'}}">返回</button><text>{{storyLabel}}</text></view>
+    <text class="title">{{storyLabel}}</text>
+    <image class="art" src="{{scene || thumb}}" mode="aspectFit" bindtap="act" data-action="preview" binderror="imageError"/>
+    <text class="muted paragraph">{{story.custom ? '拼完后欣赏整图，读一读图片的故事。' : '拼完画面后，猜一猜其中的人物。'}}</text>
+    <text class="heading">拼片数量</text>
+    <view class="difficulty"><button wx:for="{{difficulties}}" wx:key="count" class="{{count === item.count ? 'selected' : ''}}" bindtap="act" data-action="difficulty" data-arg="{{item.count}}" aria-pressed="{{count === item.count}}"><text>{{item.label}} · {{item.count}}块</text><text class="caption muted">{{item.grid}}</text></button></view>
+    <button class="secondary" bindtap="act" data-action="preview">查看完整图片</button>
+    <button class="primary" bindtap="act" data-action="start">{{current && current.storyID === story.id && current.count === count ? '继续拼图' : '开始拼图'}}</button>
+    <button wx:if="{{current && current.storyID === story.id}}" class="link" bindtap="act" data-action="restart">重新开始</button>
+    <text class="caption muted paragraph">对照原图自由摆放，提交后才判断。进度自动保存。</text>
+  </block>
+
+  <block wx:elif="{{screen === 'puzzle'}}">
+    <view class="bar with-actions"><button class="nav-link" bindtap="act" data-action="exit">{{trial ? '结束试玩' : '关闭'}}</button><text class="nav-title">{{trial ? '试玩' : storyLabel}} · {{session.count}}块</text><button class="nav-link" bindtap="act" data-action="pause">暂停</button></view>
+    <view class="row"><text>已摆放 {{placed}} / {{session.count}}</text><text class="caption muted">摆放时不判对错</text></view>
+    <view class="progress"><view style="width: {{placed / session.count * 100}}%;"></view></view>
+    <view class="tools"><button class="link" bindtap="act" data-action="preview">查看原图</button><button wx:if="{{selected !== null && !session.zoom}}" class="link" bindtap="act" data-action="adjust">调整拼片</button><button wx:if="{{session.zoom}}" class="link" bindtap="act" data-action="pan">{{session.panMode ? '继续摆放' : '浏览棋盘'}}</button><button class="link" bindtap="act" data-action="zoom">{{session.zoom ? '适合画框' : '放大棋盘'}}</button></view>
+    <scroll-view id="board-window" class="board-window" style="height: {{boardWindowHeight}}px;" scroll-x="{{session.zoom && session.panMode}}" scroll-y="{{session.zoom && session.panMode}}" scroll-left="{{panX}}" scroll-top="{{panY}}" bindscroll="scroll" data-area="board">
+      <canvas id="board" type="2d" class="board" style="width: {{boardWidth}}px; height: {{boardHeight}}px;" disable-scroll="{{!session.panMode}}" bindtouchstart="boardStart" bindtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="cancelDrag" aria-label="拼图棋盘，点选拼片后可点格子放置"></canvas>
+    </scroll-view>
+    <view class="row tray-label"><text class="heading">碎片托盘 · 剩余 {{tray.length}}</text><text class="caption muted">拖回这里可取下</text></view>
+    <scroll-view id="tray" class="tray" scroll-y="{{!dragging}}" scroll-top="{{trayScroll}}" bindscroll="scroll" data-area="tray">
+      <view class="tray-grid">
+        <view wx:for="{{tray}}" wx:key="id" class="piece {{selected === item.id ? 'piece-selected' : ''}}" style="height: {{trayPieceHeight}}px;" role="button" aria-label="待摆放碎片，选择后点击棋盘格子" bindtap="selectPiece" bindtouchstart="trayStart" bindlongpress="trayLong" bindtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="cancelDrag" data-id="{{item.id}}">
+          <view class="piece-picture" style="width: {{trayPieceWidth}}px; height: {{trayPieceHeight}}px;">
+          <image wx:if="{{atlas}}" class="atlas" src="{{atlas}}" mode="scaleToFill" style="width: 400%; height: {{atlasRows * 100}}%; left: {{-item.col * 100}}%; top: {{-item.row * 100}}%;" />
+          </view>
+        </view>
+      </view>
+      <text wx:if="{{!tray.length}}" class="muted paragraph">可以继续移动棋盘中的碎片。</text>
+    </scroll-view>
+    <text class="tray-summary">全部碎片 · 上下滚动查看更多</text>
+    <view class="submit-dock"><button class="primary" disabled="{{busy}}" bindtap="act" data-action="submit">提交拼图</button><text class="caption muted game-help">对照原图，觉得拼好了再提交。</text></view>
+    <view wx:if="{{adjusting && selected !== null}}" class="sheet-shade" catchtouchmove="noop" bindtap="act" data-action="closeAdjust"><view class="adjust-sheet" catchtap="noop"><text class="heading">调整已选拼片</text><text class="caption muted paragraph">方向移动不会判断对错。</text><view class="tools"><button bindtap="act" data-action="move" data-arg="left">←</button><button bindtap="act" data-action="move" data-arg="up">↑</button><button bindtap="act" data-action="move" data-arg="down">↓</button><button bindtap="act" data-action="move" data-arg="right">→</button><button bindtap="act" data-action="return">取下</button></view><button class="link" bindtap="act" data-action="closeAdjust">完成调整</button></view></view>
+    <view wx:if="{{ghost}}" class="ghost" style="left: {{ghost.left}}px; top: {{ghost.top}}px; width: {{ghost.width}}px; height: {{ghost.height}}px;">
+      <image class="atlas" src="{{atlas}}" mode="scaleToFill" style="width: 400%; height: {{atlasRows * 100}}%; left: {{-ghost.col * 100}}%; top: {{-ghost.row * 100}}%;" />
+    </view>
+  </block>
+
+  <block wx:elif="{{screen === 'guess'}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="exit">{{trial ? '结束试玩' : '返回画册'}}</button><text>认一认人物</text></view>
+    <image class="art" src="{{scene || thumb}}" mode="aspectFit" bindtap="act" data-action="preview" binderror="imageError"/>
+    <text class="heading">{{story.question}}</text>
+    <button wx:for="{{story.options}}" wx:key="*this" class="option {{session.chosen === item ? 'selected' : ''}}" bindtap="act" data-action="answer" data-arg="{{item}}" aria-pressed="{{session.chosen === item}}">{{item}}{{session.chosen === item ? ' · 已选' : ''}}</button>
+    <text wx:if="{{session.result}}" class="paragraph {{session.result === 'wrong' ? 'danger' : ''}}" role="status">{{session.result === 'wrong' ? story.clue : '回答正确。'}}</text>
+    <button wx:if="{{session.result !== 'correct'}}" class="primary" disabled="{{!session.chosen}}" bindtap="act" data-action="confirm">确认答案</button>
+    <button class="{{session.result === 'correct' ? 'primary' : 'link'}}" bindtap="act" data-action="reveal">查看故事</button>
+  </block>
+
+  <block wx:elif="{{screen === 'reveal' || screen === 'detail'}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="{{trial ? 'exit' : 'go'}}" data-arg="{{screen === 'detail' ? 'collection' : 'home'}}">{{trial ? '结束试玩' : '返回'}}</button><text>{{screen === 'reveal' ? '这一幅，拼好了。' : '故事详情'}}</text></view>
+    <text class="title">{{story.person}}</text><text class="muted paragraph">{{story.title}}</text>
+    <image class="art" src="{{scene || thumb}}" mode="aspectFit" bindtap="act" data-action="preview" binderror="imageError"/>
+    <text class="reader">{{story.summary}}</text>
+    <text wx:if="{{story.ref}}" class="caption muted paragraph">出处：{{story.ref}}{{story.custom ? '' : ' · 故事概述，并非经文逐字引用。'}}</text>
+    <button class="secondary" bindtap="act" data-action="preview">查看大图</button>
+    <button wx:if="{{!trial}}" class="secondary" bindtap="act" data-action="save">{{collected ? '已收藏 · 取消收藏' : '收藏这幅画'}}</button>
+    <button wx:if="{{!trial}}" class="primary" bindtap="act" data-action="{{screen === 'detail' || story.custom ? 'replay' : 'next'}}">{{screen === 'detail' || story.custom ? '重新拼这幅画' : story.id < official.length ? '下一幅' : '打开收藏册'}}</button>
+  </block>
+
+  <block wx:elif="{{screen === 'collection'}}">
+    <view class="bar with-actions"><text class="brand">我的收藏</text><button class="nav-link" bindtap="act" data-action="go" data-arg="settings">设置</button></view>
+    <text class="title">把故事收进画册。</text>
+    <text class="caption muted">收藏{{savedCount}}幅 · 已发现{{completed}}个故事</text>
+    <view class="filters"><button class="{{filter === 'saved' ? 'selected' : ''}}" bindtap="act" data-action="filter" data-arg="saved">我的收藏</button><button class="{{filter === 'all' ? 'selected' : ''}}" bindtap="act" data-action="filter" data-arg="all">全部故事</button></view>
+    <view class="collection-grid"><button wx:for="{{collection}}" wx:key="id" class="collection-item" bindtap="act" data-action="choose" data-arg="{{item.id}}"><image class="art" src="{{item.thumb}}" mode="aspectFit"/><text class="heading">{{item.label}}</text><text class="caption muted">{{item.status}}</text></button></view>
+    <view wx:if="{{!collection.length}}" class="empty"><text class="heading">这里还没有收藏。</text><text class="muted paragraph">拼完一幅画，把它收进画册。</text><button class="primary" bindtap="act" data-action="go" data-arg="list">去拼一幅</button></view>
+  </block>
+
+  <block wx:elif="{{screen === 'mysets'}}">
+    <view class="bar with-actions"><text class="brand">我的故事集</text><button class="link" bindtap="act" data-action="new">新建</button></view>
+    <text class="title">{{'把自己的图片，\n拼成故事。'}}</text>
+    <text class="muted paragraph">照片、插画或故事，都可以成为一集。</text>
+    <view wx:if="{{draft}}" class="section"><text class="heading">有一份未完成草稿</text><text class="muted paragraph">{{draft.name || '未命名图片集'}} · {{draft.items.length}}张图片</text><button class="secondary" bindtap="act" data-action="continueDraft">继续编辑</button></view>
+    <button wx:for="{{sets}}" wx:key="id" class="story-row" bindtap="act" data-action="openSet" data-arg="{{item.id}}"><image class="row-art" src="{{item.cover}}" mode="aspectFit"/><view class="row-copy"><text class="heading">{{item.name}}</text><text class="caption muted">{{item.size}}幅 · {{item.description || '我的创作'}}</text></view><text>›</text></button>
+    <view wx:if="{{!sets.length}}" class="empty"><text class="heading">第一集，从一张图片开始。</text><text class="muted paragraph">选择几张喜欢的图片，也可以写下它们的故事。</text><button class="primary" bindtap="act" data-action="new">创建图片集</button></view>
+    <text class="caption muted paragraph">仅保存当前设备，不上传。清除小程序数据会删除个人图片集。</text>
+  </block>
+
+  <block wx:elif="{{screen === 'setdetail'}}">
+    <view class="bar with-actions"><button class="link" bindtap="act" data-action="go" data-arg="mysets">返回</button><text>我的图片集</text><button class="link" bindtap="act" data-action="editSet">编辑</button></view>
+    <block wx:if="{{set}}"><text class="title">{{set.name}}</text><image class="art" src="{{set.cover}}" mode="aspectFit"/><text class="reader paragraph">{{set.description}}</text>
+    <button wx:for="{{setItems}}" wx:key="id" class="story-row" bindtap="act" data-action="choose" data-arg="{{item.id}}"><image class="row-art" src="{{item.thumb}}" mode="aspectFit"/><view class="row-copy"><text class="heading">{{item.index + 1}}. {{item.label}}</text><text class="caption muted">{{item.status}}</text></view><text>›</text></button>
+    <button class="link danger" bindtap="act" data-action="deleteSet">删除图片集</button></block>
+    <text wx:else class="muted paragraph">这份图片集已不存在，请返回重新选择。</text>
+  </block>
+
+  <block wx:elif="{{screen === 'setedit' && draft}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="go" data-arg="mysets">返回</button><text>{{draft.editID ? '编辑图片集' : '新建图片集'}}</text></view>
+    <label class="field"><text>图片集名称 · 必填</text><input value="{{draft.name}}" maxlength="60" placeholder="例如：人物与旅程" bindinput="field" data-target="draft" data-field="name"/></label>
+    <label class="field"><text>简介 · 选填</text><textarea value="{{draft.description}}" maxlength="500" placeholder="写下这一集的主题或回忆" bindinput="field" data-target="draft" data-field="description" auto-height/></label>
+    <view class="row section"><text class="heading">图片 · {{draft.items.length}}幅</text><button class="link" disabled="{{busy}}" bindtap="act" data-action="add">添加图片</button></view>
+    <text class="caption muted">可一次选择多张，用上下按钮排序。</text>
+    <view wx:for="{{draft.items}}" wx:key="id" class="edit-row">
+      <image class="row-art" src="{{item.image || item.source}}" mode="aspectFit" bindtap="act" data-action="image" data-arg="{{item.id}}"/>
+      <view class="row-copy"><button class="link row-title" bindtap="act" data-action="image" data-arg="{{item.id}}">{{item.title || '未命名图片'}}</button><button class="link caption" bindtap="act" data-action="cover" data-arg="{{item.id}}">{{draft.coverID === item.id ? '✓ 当前封面' : '设为封面'}}</button></view>
+      <view><button class="link caption" disabled="{{index === 0}}" bindtap="act" data-action="up" data-arg="{{item.id}}">上移</button><button class="link caption" disabled="{{index === draft.items.length - 1}}" bindtap="act" data-action="down" data-arg="{{item.id}}">下移</button></view>
+    </view>
+    <button class="primary" disabled="{{busy}}" bindtap="act" data-action="saveSet">保存图片集</button>
+    <button class="link danger" bindtap="act" data-action="discard">放弃草稿</button>
+    <text class="caption muted paragraph">{{error ? '草稿尚未保存，请重试。' : '草稿自动保存到本机'}}</text>
+  </block>
+
+  <block wx:elif="{{screen === 'imageedit' && item}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="go" data-arg="setedit">返回</button><text>图片与故事</text></view>
+    <text class="title">让每一幅都好拼。</text>
+    <canvas id="crop-preview" type="2d" class="crop-preview" style="height: {{baseWidth * .75}}px;" aria-label="4比3画面与难度网格预览"></canvas>
+    <text class="caption muted paragraph">{{quality}}</text>
+    <text class="heading">画面范围</text>
+    <radio-group bindchange="field" data-target="item" data-field="fit" class="radios"><label><radio value="crop" checked="{{item.fit === 'crop'}}" color="#007aff"/>裁切为4:3</label><label><radio value="contain" checked="{{item.fit === 'contain'}}" color="#007aff"/>保留整图</label></radio-group>
+    <block wx:if="{{item.fit === 'crop'}}">
+      <label class="field"><text>水平位置 · {{item.x}}</text><slider value="{{item.x}}" min="0" max="100" activeColor="#007aff" bindchange="field" data-target="item" data-field="x" data-number="true"/></label>
+      <label class="field"><text>垂直位置 · {{item.y}}</text><slider value="{{item.y}}" min="0" max="100" activeColor="#007aff" bindchange="field" data-target="item" data-field="y" data-number="true"/></label>
+      <label class="field"><text>画面放大 · {{item.zoom}}</text><slider value="{{item.zoom}}" min="1" max="3" step=".05" activeColor="#007aff" bindchange="field" data-target="item" data-field="zoom" data-number="true"/></label>
+    </block>
+    <button class="secondary" disabled="{{busy}}" bindtap="act" data-action="replace">替换图片</button>
+    <label class="field"><text>图片标题 · 选填</text><input value="{{item.title}}" maxlength="80" placeholder="为这幅画取个名字" bindinput="field" data-target="item" data-field="title"/></label>
+    <label class="field"><text>故事文字 · 选填</text><textarea value="{{item.text}}" maxlength="5000" auto-height placeholder="拼完后展示，也可以只欣赏图片" bindinput="field" data-target="item" data-field="text"/></label>
+    <label class="field"><text>出处 · 选填</text><input value="{{item.reference}}" maxlength="150" placeholder="例如：路得记2章" bindinput="field" data-target="item" data-field="reference"/></label>
+    <view class="row section"><text>拼完后增加一道题</text><switch checked="{{item.quiz.enabled}}" color="#007aff" bindchange="quizToggle"/></view>
+    <block wx:if="{{item.quiz.enabled}}">
+      <label class="field"><text>题目</text><input value="{{item.quiz.question}}" maxlength="200" bindinput="field" data-target="quiz" data-field="question"/></label>
+      <label wx:for="{{item.quiz.options}}" wx:for-item="option" wx:key="index" class="field"><text>选项{{index + 1}}</text><input value="{{option}}" maxlength="80" bindinput="field" data-target="option" data-field="{{index}}"/></label>
+      <radio-group class="radios" bindchange="field" data-target="quiz" data-field="answer" data-number="true"><label wx:for="{{[0,1,2]}}" wx:for-item="answerIndex" wx:key="*this"><radio value="{{answerIndex}}" checked="{{answerIndex === item.quiz.answer}}" color="#007aff"/>选项{{answerIndex + 1}}</label></radio-group>
+    </block>
+    <text class="heading section">碎片预览与试玩</text>
+    <view class="difficulty"><button wx:for="{{difficulties}}" wx:for-item="difficulty" wx:key="count" class="{{difficulty.count === item.difficulty ? 'selected' : ''}}" bindtap="act" data-action="grid" data-arg="{{difficulty.count}}">{{difficulty.label}} · {{difficulty.count}}块</button></view>
+    <button class="secondary" disabled="{{busy}}" bindtap="act" data-action="trial">试玩这幅图</button>
+    <button class="primary" disabled="{{busy}}" bindtap="act" data-action="doneImage">完成编辑</button>
+    <button class="link danger" bindtap="act" data-action="removeImage">移除这幅图</button>
+  </block>
+
+  <block wx:elif="{{screen === 'settings'}}">
+    <view class="bar"><button class="link" bindtap="act" data-action="go" data-arg="home">返回</button><text>设置</text></view>
+    <view class="setting"><text>音效</text><switch checked="{{settings.sound}}" color="#007aff" bindchange="preference" data-key="sound"/></view>
+    <view class="setting"><text>触感</text><switch checked="{{settings.haptic}}" color="#007aff" bindchange="preference" data-key="haptic"/></view>
+    <text class="caption muted paragraph">声音与触感仅用于中性操作反馈，不提示摆放对错。声音遵守系统静音设置。</text>
+    <button class="secondary" bindtap="act" data-action="content">内容说明</button>
+    <text class="muted paragraph">进度、收藏、个人图片与草稿保存在当前设备，不上传服务器。清除小程序数据会删除这些资料。</text>
+    <button class="link danger" bindtap="act" data-action="clear">清除所有游玩进度</button>
+  </block>
+</view>
+<view wx:if="{{root}}" class="tabbar" style="padding-bottom: {{safeBottom + 8}}px;">
+  <button class="{{screen === 'home' ? 'active' : ''}}" bindtap="act" data-action="go" data-arg="home">故事</button>
+  <button class="{{screen === 'mysets' ? 'active' : ''}}" bindtap="act" data-action="go" data-arg="mysets">我的故事集</button>
+  <button class="{{screen === 'collection' ? 'active' : ''}}" bindtap="act" data-action="go" data-arg="collection">收藏</button>
+</view>
+<view class="cache"><canvas id="piece-cache" type="2d"></canvas><canvas id="crop-cache" type="2d"></canvas></view>

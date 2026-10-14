@@ -1,11 +1,18 @@
 {
   "name": "bible-story-puzzle",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Offline Bible story and personal image puzzle for iOS",
   "scripts": {
     "start": "node scripts/serve.cjs",
-    "test": "node scripts/run-tests.cjs"
+    "test": "node scripts/run-tests.cjs && node tests/miniprogram.cjs",
+    "test:mini": "node tests/miniprogram.cjs",
+    "sync:mini": "python scripts/sync-miniprogram.py",
+    "test:game": "node tests/minigame.cjs",
+    "sync:game": "python scripts/sync-minigame.py",
+    "test:mini:ui": "node tests/miniprogram-ui.cjs"
   },
-  "devDependencies": { "playwright": "1.56.1" }
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
 }

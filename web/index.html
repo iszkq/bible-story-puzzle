@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="icon" href="assets/icon.png"><title>拼见圣经 · iOS页面流程稿</title>
+<link rel="icon" href="assets/icon.png"><title>拾光拼图册 · iOS页面流程稿</title>
 <style>
 :root{--bg:#f2f2f7;--surface:#ffffff;--text:#000000;--muted:#6e6e73;--accent:#007aff;--border:#c6c6c8;--control:#8e8e93;--error:#ff3b30}
 *{box-sizing:border-box}body{margin:0;background:#e5e5ea;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.6}button,a{font:inherit}button{cursor:pointer;color:inherit}button:disabled{cursor:default;opacity:.48}button:focus-visible,a:focus-visible{outline:3px solid #007aff;outline-offset:4px}a{color:var(--accent)}
@@ -45,7 +45,7 @@
 <main class="workspace">
 <aside class="sidebar">
 <p class="eyebrow">成人向 iOS 拼图 · 系统色 v0.4</p>
-<h1>拼见圣经</h1>
+<h1>拾光拼图册</h1>
 <p class="intro">先拼出画面，再认识人物。拖动碎片到格子，自行对照原图；提交后才检查整体。已接入你提供的八张图片。</p>
 <nav class="pages" aria-label="设计页面"></nav>
 <div class="docs"><a href="设计流程与iOS页面规划.md">完整页面规划 ↗</a><a href="素材需求与精美制作流程.md">素材需求与制作流程 ↗</a></div>
@@ -59,17 +59,11 @@
 </section>
 <aside class="notes" id="notes" aria-label="当前页面设计说明"></aside>
 </main>
+<script src="shared.js"></script>
 <script>
 'use strict';
 const pages=[['welcome','P00 欢迎'],['home','P01 故事首页'],['list','P02 选关'],['prepare','P03 准备'],['puzzle','P04 拼图'],['guess','P05 认人物'],['reveal','P06 揭晓'],['collection','P07 收藏'],['detail','P08 详情'],['settings','P09 设置']];
-const stories=[
- {id:1,person:'摩西',title:'海中的道路',ref:'出埃及记14:15–31',clue:'再观察一下他手中的手杖和两侧的海水。',question:'画面中拿着手杖、带领人群的人是谁？',options:['约书亚','摩西','亚伦'],summary:'以色列人来到海边，前方是海水，后方有追兵。摩西按照上帝的吩咐向海伸杖，海水分开，百姓走在干地上经过。他们在艰难处境中经历了出路。画面以手杖、两侧海水和行进的人群作为识别线索。'},
- {id:2,person:'挪亚',title:'归来的鸽子',ref:'创世记8:6–12',clue:'留意方舟和归来的鸽子。',question:'方舟旁接回鸽子的人是谁？',options:['亚伯拉罕','挪亚','雅各'],summary:'洪水之后，挪亚从方舟里放出鸽子，观察地面的变化。鸽子后来带回新拧下来的橄榄叶，成为画面中的重要线索。'},
- {id:3,person:'大卫',title:'少年与巨人',ref:'撒母耳记上17章',clue:'留意少年手中的投石索。',question:'手持投石索的少年是谁？',options:['大卫','扫罗','撒母耳'],summary:'大卫面对体型高大的歌利亚，没有使用王的盔甲，而是带着牧人的器具迎上前去。少年与巨人的体型差和投石索，是这个故事的画面线索。'},
- {id:4,person:'路得',title:'麦田里的拾穗者',ref:'路得记2章',clue:'观察她在田间拾取麦穗的动作。',question:'在这段故事中，田间拾穗的人是谁？',options:['以斯帖','路得','米利暗'],summary:'路得来到田间，跟在收割的人后面拾取麦穗。她在波阿斯的田里得到帮助。画面以麦田与拾穗动作呈现这个故事。'},
- {id:5,person:'但以理',title:'狮子之间',ref:'但以理书6章',clue:'观察人物周围的狮子和洞穴。',question:'狮子之间的主要人物是谁？',options:['约拿','以利亚','但以理'],summary:'但以理因坚持祷告被投入狮子坑。他在其中得到保守，后来从坑中被带出来。画面以洞穴、狮子和人物平静的姿态作为线索。'},
- {id:6,person:'以斯帖',title:'王宫中的请求',ref:'以斯帖记5:1–3',clue:'观察王后、王宫和伸出的金杖。',question:'来到王面前提出请求的王后是谁？',options:['路得','以斯帖','底波拉'],summary:'以斯帖穿上朝服，来到王宫内院。王看见她，向她伸出金杖，她便上前触摸杖头。画面以王宫、王后和金杖呈现这段情节。'}
-];
+const stories=PuzzleShared.stories.map(s=>({...s,options:[...s.options]}));
 const spec={
 welcome:{name:'欢迎与教学',goal:'一句话说明玩法，直接进入样板关。',layout:['中性封面，不展示待猜人物','主按钮进入第一关；次按钮浏览故事','教学在首次放片时出现，不做长轮播'],assets:'B01 中性欢迎插画；字标由页面排版。',states:'首次、跳过教学、封面加载失败。'},
 home:{name:'故事首页',goal:'打开后能继续上次，或开始下一个故事。',layout:['一个主要封面与一个主要动作','进行中显示已摆片数；封面展示完整图片','底部为故事、我的故事集、收藏三个Tab'],assets:'A02完整故事图与同图缩略封面。',states:'首次、进行中、等待回答、上次结果、全部完成。'},
@@ -101,13 +95,13 @@ function ensure(){if(!current())makeCurrent();count=state.current.count;if(!stat
 function finish(){if(!creator.trial&&!state.completed.includes(storyID))state.completed.push(storyID);if(current())state.current.phase='guess';persist();}
 function storyRows(){return stories.filter(s=>!s.custom).map(s=>{const completed=state.completed.includes(s.id),locked=s.id>1&&!state.completed.includes(s.id-1),running=state.current?.storyID===s.id&&!completed;return `<button class="story-row" data-action="choose:${s.id}" ${locked?'aria-disabled="true"':''}><div class="art small-art"><img src="assets/${sceneNames[s.id-1]}-thumb.jpg" alt="故事封面" draggable="false"></div><div class="copy"><strong>${title(s)}</strong><p class="tag">${completed?'已发现 · 查看故事':locked?'完成前一个故事后开启':running?'继续 · '+state.current.placed.length+'/'+state.current.count:'可拼 · 12/24/48块'}</p></div><span aria-hidden="true">${locked?'锁定':'›'}</span></button>`;}).join('');}
 function render(){const s=story(),c=current();let html='';document.getElementById('overlay').innerHTML='';
-if(screen==='welcome')html=`<div style="padding-top:30px"><p class="eyebrow">拼见圣经</p>${art('neutral')}<h2>拼出画面，<br>发现故事。</h2><p class="muted">把碎片放回画框，认一认画面中的人物，把喜欢的故事收进画册。</p>${button('开始第一个故事','first')}${button('浏览故事','go:home','text-button')}<p class="explain">无需登录。可随时查看原图，摆放完成后主动提交。</p></div>`;
-if(screen==='home'){const session=state.current;const all=state.completed.filter(id=>id<=6).length===6;const next=stories.find(x=>!x.custom&&!state.completed.includes(x.id))||stories[0];const shown=session?(stories.find(x=>x.id===session.storyID)||stories[0]):next;const label=session?(session.phase==='puzzle'?'继续拼图':session.phase==='guess'?(shown.custom?'继续答题':'继续认人物'):'查看上次故事'):(all?'重温已发现的故事':'开始下一个故事');html=`<div class="bar"><strong><img class="app-mark" src="assets/icon.png" alt="">拼见圣经</strong>${button('设置','go:settings','icon-button')}</div><h2>今天，拼一个故事。</h2>${art(state.completed.includes(shown.id)?'full':'unknown',false,shown.id)}<div class="row"><strong>${title(shown)}</strong><span class="tag">${session?session.placed.length+'/'+session.count+'块':'12块起'}</span></div><p class="muted small">${session?'进度已保存，随时继续。':'从画面中的线索，认识一个人物。'}</p>${button(label,'resume')}<div class="block"><div class="row"><h3>故事篇章</h3>${button('查看全部','go:list','text-button')}</div><button class="chapter" data-action="go:list"><span>第一辑 · 发现与旅程<br><small class="muted">已完成${state.completed.filter(id=>id<=6).length}/6个故事</small></span><span aria-hidden="true">›</span></button></div>${state.collected.length?`<div class="block"><h3>最近收藏</h3><p class="muted small">${state.collected.slice(-2).map(id=>(stories.find(x=>x.id===id)?.person||'我的图片')).join(' · ')}</p>${button('打开收藏册','go:collection','text-button')}</div>`:''}`;}
-if(screen==='list')html=`${bar('故事篇章')}<h2>发现与旅程</h2><p class="muted">六个画面，六个故事。拼完一幅，开启下一幅。</p><p class="small muted">已完成${state.completed.filter(id=>id<=6).length}/6 · 答错也可以查看故事</p>${storyRows()}`;
+if(screen==='welcome')html=`<div style="padding-top:30px"><p class="eyebrow">拾光拼图册</p>${art('neutral')}<h2>拼出画面，<br>发现故事。</h2><p class="muted">把碎片放回画框，认一认画面中的人物，把喜欢的故事收进画册。</p>${button('开始第一个故事','first')}${button('浏览故事','go:home','text-button')}<p class="explain">无需登录。可随时查看原图，摆放完成后主动提交。</p></div>`;
+if(screen==='home'){const session=state.current;const all=state.completed.filter(id=>id<=PuzzleShared.stories.length).length===PuzzleShared.stories.length;const next=stories.find(x=>!x.custom&&!state.completed.includes(x.id))||stories[0];const shown=session?(stories.find(x=>x.id===session.storyID)||stories[0]):next;const label=session?(session.phase==='puzzle'?'继续拼图':session.phase==='guess'?(shown.custom?'继续答题':'继续认人物'):'查看上次故事'):(all?'重温已发现的故事':'开始下一个故事');html=`<div class="bar"><strong><img class="app-mark" src="assets/icon.png" alt="">拾光拼图册</strong>${button('设置','go:settings','icon-button')}</div><h2>今天，拼一个故事。</h2>${art(state.completed.includes(shown.id)?'full':'unknown',false,shown.id)}<div class="row"><strong>${title(shown)}</strong><span class="tag">${session?session.placed.length+'/'+session.count+'块':'12块起'}</span></div><p class="muted small">${session?'进度已保存，随时继续。':'从画面中的线索，认识一个人物。'}</p>${button(label,'resume')}<div class="block"><div class="row"><h3>故事篇章</h3>${button('查看全部','go:list','text-button')}</div><button class="chapter" data-action="go:list"><span>第一辑 · 发现与旅程<br><small class="muted">已完成${state.completed.filter(id=>id<=PuzzleShared.stories.length).length}/${PuzzleShared.stories.length}个故事</small></span><span aria-hidden="true">›</span></button></div>${state.collected.length?`<div class="block"><h3>最近收藏</h3><p class="muted small">${state.collected.slice(-2).map(id=>(stories.find(x=>x.id===id)?.person||'我的图片')).join(' · ')}</p>${button('打开收藏册','go:collection','text-button')}</div>`:''}`;}
+if(screen==='list')html=`${bar('故事篇章')}<h2>发现与旅程</h2><p class="muted">24个画面，24个故事。拼完一幅，开启下一幅。</p><p class="small muted">已完成${state.completed.filter(id=>id<=PuzzleShared.stories.length).length}/${PuzzleShared.stories.length} · 答错也可以查看故事</p>${storyRows()}`;
 if(screen==='prepare')html=`${bar(number(storyID),'list')}<h2>${title(s)}</h2>${art(state.completed.includes(storyID)?'full':'unknown')}<p class="muted">${state.completed.includes(storyID)?'重温这幅画。已发现与收藏记录会保留。':'拼完画面后，猜一猜其中的人物。'}</p><h3>拼片数量</h3><div class="difficulty">${[12,24,48].map(n=>`<button class="${count===n?'selected':''}" aria-pressed="${count===n}" data-action="difficulty:${n}">${n===12?'轻松':n===24?'标准':'困难'} · ${n}块<small>${n===12?'4列 × 3行':n===24?'6列 × 4行':'8列 × 6行'}</small></button>`).join('')}</div><p class="small muted block">随时暂停，自动保存。对照原图自由摆放，提交后才判断。</p>${button('查看完整图片','sheet:preview','secondary')}${button(c?'继续拼图':'开始拼图','start')}${c?button('重新开始','restart','text-button'):''}`;
 if(screen==='puzzle'){ensure();html=puzzleHTML();}
 if(screen==='guess'){ensure();html=`${bar(s.custom?'回答问题':'发现人物','home')}${art('full',true)}<h3>${s.question}</h3>${s.options.map(o=>`<button class="option ${chosen===o?'selected':''} ${result==='wrong'&&chosen===o?'wrong':''}" data-action="answer:${s.custom?encodeURIComponent(o):o}" aria-pressed="${chosen===o}"><span>${o}</span><span class="small">${chosen===o?'已选':''}</span></button>`).join('')}<div class="message ${result==='wrong'?'error':'success'}" role="status">${result==='wrong'?s.clue:result==='correct'?s.custom?'✓ 回答正确。':'✓ 是'+s.person+'。':''}</div>${result==='correct'?button('查看故事','toReveal'):button('确认答案','confirm','primary',chosen?'':'disabled')}${result==='correct'?'':button('查看故事','toReveal','text-button')}`;}
-if(screen==='reveal')html=`${bar('故事揭晓','home')}<p class="eyebrow">你发现了</p><h2>${s.person}</h2><p class="muted">${s.title}</p>${art('full')}<p class="reader">${s.summary}</p><p class="reference">出处：${s.ref}<br><span class="small">以上为故事概述，并非经文逐字引用。</span></p>${button(state.collected.includes(storyID)?'已收藏 · 取消收藏':'收藏这个故事','save','secondary')}${button(storyID<6?'下一个故事':'打开收藏册',storyID<6?'next':'go:collection')}${button('返回故事库','leave','text-button')}`;
+if(screen==='reveal')html=`${bar('故事揭晓','home')}<p class="eyebrow">你发现了</p><h2>${s.person}</h2><p class="muted">${s.title}</p>${art('full')}<p class="reader">${s.summary}</p><p class="reference">出处：${s.ref}<br><span class="small">以上为故事概述，并非经文逐字引用。</span></p>${button(state.collected.includes(storyID)?'已收藏 · 取消收藏':'收藏这个故事','save','secondary')}${button(storyID<PuzzleShared.stories.length?'下一个故事':'打开收藏册',storyID<PuzzleShared.stories.length?'next':'go:collection')}${button('返回故事库','leave','text-button')}`;
 if(screen==='detail')html=`${bar('故事详情','collection',button(state.collected.includes(storyID)?'已收藏':'收藏','save','icon-button'))}${art('full')}<h2>${s.person}</h2><h3>${s.title}</h3><p class="reader">${s.summary}</p><p class="reference">出处：${s.ref}</p>${button('查看大图','sheet:large','secondary')}${button('重新拼这幅画','replay')}<p class="explain">重玩不会删除已发现与收藏记录。正式图片可全屏缩放。</p>`;
 if(screen==='settings')html=`${bar('设置')}<h3>游玩体验</h3><label class="setting"><span>音效<small>遵守系统静音；仅拿放与完成时播放</small></span><input type="checkbox" data-setting="sound" ${state.settings.sound?'checked':''}></label><label class="setting"><span>触感反馈<small>关闭后仍有明确视觉反馈</small></span><input type="checkbox" data-setting="haptic" ${state.settings.haptic?'checked':''}></label><div class="block"><h3>阅读与无障碍</h3><div class="setting"><span>文字大小<small>iOS阅读文字、标题和题目跟随系统</small></span><span class="small muted">系统</span></div><div class="setting"><span>减少动态效果<small>跟随系统；游戏没有持续动效</small></span><span class="small muted">系统</span></div></div><div class="block"><h3>关于</h3>${button('内容说明','sheet:content','setting')}${button('本地存档说明','sheet:storage','setting')}${button('清除本地进度','sheet:clear','setting danger')}</div><p class="explain">图片与进度保存在本机。删除App会删除本地内容。</p>`;
 if(customScreens.includes(screen))html=creatorHTML(screen);
@@ -145,7 +139,7 @@ document.addEventListener('click',e=>{const target=e.target.closest('[data-actio
 if(action==='go'){if(['home','collection'].includes(arg))persist();go(arg);return;}
 if(action==='inspect'){if(['puzzle','guess'].includes(arg))ensure();if(['guess','reveal'].includes(arg)&&current()?.submitResult!=='correct'&&!state.completed.includes(storyID)){toast('请先提交拼图并通过校验。');return;}go(arg);return;}
 if(action==='first'){storyID=1;count=12;go('prepare');return;}
-if(action==='resume'){if(state.current){storyID=state.current.storyID;count=state.current.count;go(state.current.phase);}else if(state.completed.filter(id=>id<=6).length===6){go('collection');}else{storyID=stories.find(s=>!s.custom&&!state.completed.includes(s.id)).id;go('prepare');}return;}
+if(action==='resume'){if(state.current){storyID=state.current.storyID;count=state.current.count;go(state.current.phase);}else if(state.completed.filter(id=>id<=PuzzleShared.stories.length).length===PuzzleShared.stories.length){go('collection');}else{storyID=stories.find(s=>!s.custom&&!state.completed.includes(s.id)).id;go('prepare');}return;}
 if(action==='choose'){const id=Number(arg);if(id>1&&!state.completed.includes(id-1)){toast('完成前一个故事后开启。');return;}storyID=id;if(state.completed.includes(id)){go('detail');}else{count=current()?.count||12;go('prepare');}return;}
 if(action==='difficulty'){const value=Number(arg);if(current()&&value!==state.current.count){count=value;showSheet('restart');}else{count=value;render();}return;}
 if(action==='start'){if(state.current&&!current()){pendingStory=storyID;showSheet('replace');return;}if(!current())makeCurrent();go(state.current.phase);return;}
@@ -165,7 +159,7 @@ if(action==='answer'){chosen=arg;result='';state.current.chosen=chosen;state.cur
 if(action==='confirm'){result=chosen===story().person?'correct':'wrong';state.current.result=result;persist();render();return;}
 if(action==='toReveal'){if(current()?.submitResult!=='correct')return;finish();state.current.phase='reveal';if(result!=='correct')state.current.result='revealed';persist();go('reveal');return;}
 if(action==='save'){if(!state.completed.includes(storyID)){toast('流程预览：先拼完并揭晓后才能收藏。');return;}const i=state.collected.indexOf(storyID);if(i>=0)state.collected.splice(i,1);else state.collected.push(storyID);persist();render();toast(i>=0?'已取消收藏':'已加入收藏');return;}
-if(action==='next'){storyID=Math.min(6,storyID+1);state.current=null;count=12;persist();go('prepare');return;}
+if(action==='next'){storyID=Math.min(PuzzleShared.stories.length,storyID+1);state.current=null;count=12;persist();go('prepare');return;}
 if(action==='leave'){state.current=null;persist();go('home');return;}
 if(action==='exit'){persist();go('home');return;}
 if(action==='filter'){filter=arg;render();return;}
@@ -178,24 +172,11 @@ document.addEventListener('change',e=>{if(e.target.dataset.setting){state.settin
 document.addEventListener('keydown',e=>{const dialog=document.querySelector('.sheet');if(!dialog)return;if(e.key==='Escape'){e.preventDefault();closeSheet();return;}if(e.key==='Tab'){const nodes=[...dialog.querySelectorAll('button:not(:disabled),a,input')];const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}});
 function normalizeGridSave(){const c=state.current;if(!c?.positions)return;const {cols,rows}=gridFor(c.count),used=new Set();for(const id of c.placed){const p=c.positions[id];if(!p)continue;let slot=Math.max(0,Math.min(rows-1,Math.floor(p.y*rows)))*cols+Math.max(0,Math.min(cols-1,Math.floor(p.x*cols)));if(used.has(slot)){delete c.positions[id];continue;}used.add(slot);c.positions[id]={...p,slot,x:(slot%cols+.5)/cols,y:(Math.floor(slot/cols)+.5)/rows};}c.placed=c.placed.filter(id=>c.positions[id]);persist();}
 // Fragment geometry is independent of placement. No target information is used while dragging.
-const sceneNames=['moses','noah','david','ruth','daniel','esther'];
+const sceneNames=PuzzleShared.sceneNames;
 const sceneURL=(id=storyID)=>stories.find(s=>s.id===id)?.image||'assets/'+sceneNames[id-1]+'.jpg';
-const gridFor=n=>n===48?{cols:8,rows:6}:n===24?{cols:6,rows:4}:{cols:4,rows:3};
-function piecePath(id,n){
- const {cols,rows}=gridFor(n),col=id%cols,row=Math.floor(id/cols);
- let d='M 0 0';
- function edge(x,y,dx,dy,nx,ny,sign){
-  const p=(t,h)=>`${x+dx*t+nx*h} ${y+dy*t+ny*h}`;
-  if(!sign){d+=` L ${p(1,0)}`;return;}
-  d+=` L ${p(.32,0)} C ${p(.4,0)} ${p(.32,18*sign)} ${p(.5,18*sign)} C ${p(.68,18*sign)} ${p(.6,0)} ${p(.68,0)} L ${p(1,0)}`;
- }
- const h=(r,c)=>(r*13+c*7)%2?1:-1,v=(r,c)=>(r*11+c*3)%2?1:-1;
- edge(0,0,100,0,0,-1,row?h(row,col):0);
- edge(100,0,0,100,1,0,col<cols-1?v(row,col+1):0);
- edge(100,100,-100,0,0,1,row<rows-1?-h(row+1,col):0);
- edge(0,100,0,-100,-1,0,col?-v(row,col):0);
- return d+' Z';
-}
+const gridFor=PuzzleShared.gridFor;
+const piecePath=PuzzleShared.piecePath;
+
 function pieceSVG(id,where='tray'){
  const {cols,rows}=gridFor(count),col=id%cols,row=Math.floor(id/cols),clip=`p-${where}-${storyID}-${id}`;
  const d=piecePath(id,count);
@@ -214,8 +195,9 @@ function renderKeepingPosition(focusID=null){
  if(focusID!==null)document.querySelector(`[data-piece="${focusID}"]`)?.focus({preventScroll:true});
 }
 function syncPlaced(){state.current.placed=Object.keys(state.current.positions).map(Number).sort((a,b)=>state.current.positions[a].z-state.current.positions[b].z);}
-function dropPiece(id,x,y){const c=state.current,{cols,rows}=gridFor(count),col=Math.max(0,Math.min(cols-1,Math.floor(x*cols))),row=Math.max(0,Math.min(rows-1,Math.floor(y*rows))),slot=row*cols+col,old=c.positions[id];const occupant=Object.keys(c.positions).find(other=>Number(other)!==id&&c.positions[other].slot===slot);if(occupant!==undefined){if(old)c.positions[occupant]={...old,z:++c.layer};else delete c.positions[occupant];}c.positions[id]={slot,x:(col+.5)/cols,y:(row+.5)/rows,z:++c.layer};c.submitResult='';syncPlaced();persist();}
-function returnPiece(id){delete state.current.positions[id];state.current.submitResult='';syncPlaced();persist();}
+function dropPiece(id,x,y){PuzzleShared.dropPiece(state.current,id,x,y);persist();}
+function returnPiece(id){PuzzleShared.returnPiece(state.current,id);persist();}
+
 function submitPuzzle(){
  const c=current();if(!c||c.phase!=='puzzle')return;
  c.submitAttempts=(c.submitAttempts||0)+1;
