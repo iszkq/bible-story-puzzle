@@ -1,3 +1,4 @@
+<page-meta page-style="{{dragging ? 'overflow: hidden;' : ''}}" />
 <view class="page {{root ? 'has-tabs' : ''}} {{screen === 'puzzle' ? 'puzzle-page' : ''}}">
   <view wx:if="{{error}}" class="error" role="alert">
     <text>{{error}}</text>
@@ -57,13 +58,13 @@
     <view class="row"><text>已摆放 {{placed}} / {{session.count}}</text><text class="caption muted">摆放时不判对错</text></view>
     <view class="progress"><view style="width: {{placed / session.count * 100}}%;"></view></view>
     <view class="tools"><button class="link" bindtap="act" data-action="preview">查看原图</button><button wx:if="{{selected !== null && !session.zoom}}" class="link" bindtap="act" data-action="adjust">调整拼片</button><button wx:if="{{session.zoom}}" class="link" bindtap="act" data-action="pan">{{session.panMode ? '继续摆放' : '浏览棋盘'}}</button><button class="link" bindtap="act" data-action="zoom">{{session.zoom ? '适合画框' : '放大棋盘'}}</button></view>
-    <scroll-view id="board-window" class="board-window" style="height: {{boardWindowHeight}}px;" scroll-x="{{session.zoom && session.panMode}}" scroll-y="{{session.zoom && session.panMode}}" scroll-left="{{panX}}" scroll-top="{{panY}}" bindscroll="scroll" data-area="board">
-      <view id="board" class="board" style="width: {{boardWidth}}px; height: {{boardHeight}}px;" bindtouchstart="boardStart" catchtouchmove="{{session.panMode ? '' : 'touchMove'}}" bindtouchend="touchEnd" bindtouchcancel="cancelDrag" aria-label="拼图棋盘，点选拼片后可点格子放置"><block wx:for="{{boardFrames}}" wx:key="key"><image wx:if="{{item.src}}" class="board-frame {{boardFront === index ? 'board-frame-visible' : ''}}" src="{{item.src}}" mode="scaleToFill" bindload="boardFrameLoaded" binderror="boardFrameError" data-buffer="{{index}}" data-src="{{item.src}}" /></block></view>
-    </scroll-view>
+    <view id="board-window" class="board-window" style="height: {{boardWindowHeight}}px;">
+      <view id="board" class="board" style="width: {{boardWidth}}px; height: {{boardHeight}}px; transform: translate({{-panX}}px, {{-panY}}px);" bindtouchstart="boardStart" catchtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="cancelDrag" aria-label="拼图棋盘，点选拼片后可点格子放置"><block wx:for="{{boardFrames}}" wx:key="key"><image wx:if="{{item.src}}" class="board-frame {{boardFront === index ? 'board-frame-visible' : ''}}" src="{{item.src}}" mode="scaleToFill" bindload="boardFrameLoaded" binderror="boardFrameError" data-buffer="{{index}}" data-src="{{item.src}}" /></block></view>
+    </view>
     <view class="row tray-label"><text class="heading">碎片托盘 · 剩余 {{tray.length}}</text><text class="caption muted">拖回这里可取下</text></view>
-    <scroll-view id="tray" class="tray" scroll-y="{{!dragging}}" scroll-top="{{trayScroll}}" bindscroll="scroll" data-area="tray">
+    <scroll-view id="tray" class="tray" scroll-y="{{!trayTouch && !dragging}}" scroll-top="{{trayScroll}}" bindscroll="scroll" data-area="tray">
       <view class="tray-grid">
-        <view wx:for="{{tray}}" wx:key="id" class="piece {{selected === item.id ? 'piece-selected' : ''}}" style="height: {{trayPieceHeight}}px;" role="button" aria-label="待摆放碎片，选择后点击棋盘格子" bindtap="selectPiece" bindtouchstart="trayStart" bindlongpress="trayLong" bindtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="cancelDrag" data-id="{{item.id}}">
+        <view wx:for="{{tray}}" wx:key="id" class="piece {{selected === item.id ? 'piece-selected' : ''}}" style="height: {{trayPieceHeight}}px;" role="button" aria-label="待摆放碎片，选择后点击棋盘格子" bindtap="selectPiece" bindtouchstart="trayStart" bindlongpress="trayLong" catchtouchmove="touchMove" bindtouchend="touchEnd" bindtouchcancel="cancelDrag" data-id="{{item.id}}">
           <view class="piece-picture" style="width: {{trayPieceWidth}}px; height: {{trayPieceHeight}}px;">
           <image wx:if="{{atlas}}" class="atlas" src="{{atlas}}" mode="scaleToFill" style="width: 400%; height: {{atlasRows * 100}}%; left: {{-item.col * 100}}%; top: {{-item.row * 100}}%;" />
           </view>
@@ -71,7 +72,7 @@
       </view>
       <text wx:if="{{!tray.length}}" class="muted paragraph">可以继续移动棋盘中的碎片。</text>
     </scroll-view>
-    <text class="tray-summary">全部碎片 · 上下滚动查看更多</text>
+    <view class="tray-summary" bindtouchstart="trayBrowseStart" catchtouchmove="trayBrowseMove" bindtouchend="trayBrowseEnd" bindtouchcancel="trayBrowseEnd" aria-label="上下滑动浏览剩余碎片">上下滑动此处浏览碎片 · 碎片可直接拖动</view>
     <view class="submit-dock"><button class="primary" disabled="{{busy}}" bindtap="act" data-action="submit">提交拼图</button><text class="caption muted game-help">对照原图，觉得拼好了再提交。</text></view>
     <view wx:if="{{adjusting && selected !== null}}" class="sheet-shade" catchtouchmove="noop" bindtap="act" data-action="closeAdjust"><view class="adjust-sheet" catchtap="noop"><text class="heading">调整已选拼片</text><text class="caption muted paragraph">方向移动不会判断对错。</text><view class="tools"><button bindtap="act" data-action="move" data-arg="left">←</button><button bindtap="act" data-action="move" data-arg="up">↑</button><button bindtap="act" data-action="move" data-arg="down">↓</button><button bindtap="act" data-action="move" data-arg="right">→</button><button bindtap="act" data-action="return">取下</button></view><button class="link" bindtap="act" data-action="closeAdjust">完成调整</button></view></view>
     <view wx:if="{{ghost}}" class="ghost {{ghost.settled ? 'ghost-settled' : ''}}" style="left: {{ghost.left}}px; top: {{ghost.top}}px; width: {{ghost.width}}px; height: {{ghost.height}}px;">
@@ -204,9 +205,11 @@
 <view wx:if="{{previewOpen}}" class="sheet-shade preview-shade" catchtouchmove="noop" role="dialog" aria-modal="true" aria-label="完整图片预览">
   <view class="preview-sheet page">
     <text class="heading preview-heading">完整图片预览</text>
-    <scroll-view class="preview-window" scroll-x="{{previewLarge}}" scroll-y="{{previewLarge}}" scroll-left="{{previewX}}" scroll-top="{{previewY}}" style="height: {{previewLarge ? previewMaxHeight : baseWidth * .75}}px;">
-      <image wx:if="{{previewPath}}" class="preview-art" src="{{previewPath}}" mode="aspectFit" style="width: {{previewLarge ? 760 : baseWidth}}px; height: {{previewLarge ? 570 : baseWidth * .75}}px;" bindload="previewReady" binderror="previewFailed" data-src="{{previewPath}}"/>
-    </scroll-view>
+    <view class="preview-window" catchtouchstart="previewPanStart" catchtouchmove="previewPanMove" catchtouchend="previewPanEnd" catchtouchcancel="previewPanEnd" style="height: {{previewLarge ? previewMaxHeight : baseWidth * .75}}px;">
+      <view class="preview-content" style="width: {{previewLarge ? previewZoomWidth : baseWidth}}px; height: {{previewLarge ? previewZoomHeight : baseWidth * .75}}px; transform: translate({{-previewX}}px, {{-previewY}}px);">
+        <image wx:if="{{previewPath}}" class="preview-art" src="{{previewPath}}" mode="aspectFit" style="width: 100%; height: 100%;" bindload="previewReady" binderror="previewFailed" data-src="{{previewPath}}"/>
+      </view>
+    </view>
     <view wx:if="{{previewLoading}}" class="caption muted paragraph" role="status">正在读取完整图片…</view>
     <view wx:if="{{previewError}}" class="error" role="alert"><text>{{previewError}}</text><button class="link" bindtap="preview">重试</button></view>
     <view class="preview-tools"><button class="link" disabled="{{previewLoading || !!previewError}}" bindtap="previewZoom">{{previewLarge ? '适合窗口' : '放大图片'}}</button><text class="caption muted">不限次数 · 无惩罚</text></view>

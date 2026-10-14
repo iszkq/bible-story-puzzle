@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-14T15:37:11.414Z",
+  "checks": [
+    "Horizontal element gesture moves the visible enlarged image",
+    "Diagonal pan reaches the bottom-right corner and clamps at both edges",
+    "Fit and return preserve the full saved puzzle"
+  ],
+  "errors": []
+}

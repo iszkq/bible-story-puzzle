@@ -44,8 +44,9 @@ const page={data:{},setData(data,callback){
   const exports=[],current={count:12,placed:[],positions:{}};
   Media.invoke=async(method,args)=>new Promise((resolve,reject)=>exports.push({args,resolve,reject}));
   const boardUpdates=[];
-  const boardPage={data:{boardWidth:350},store:{state:{current}},setData(data){boardUpdates.push(data);Object.assign(this.data,data);},fail(e){throw e;}};
+  const boardPage={data:{boardWidth:350},store:{state:{current}},setData(data,callback){boardUpdates.push(data);Object.assign(this.data,data);if(callback)queueMicrotask(callback);},fail(e){throw e;}};
   const boardRenderer=new Renderer(boardPage);boardRenderer.canvas=board;boardRenderer.ctx=context;boardRenderer.img={};
+  boardRenderer.viewWidth=350;boardRenderer.viewHeight=262.5;
   const older=boardRenderer.draw(),newer=boardRenderer.draw();
   assert.equal(exports[0].args.width,350);assert.equal(exports[0].args.destWidth,700);
   exports[1].resolve({tempFilePath:'new-frame'});await newer;
@@ -71,5 +72,19 @@ const page={data:{},setData(data,callback){
   const closing=boardRenderer.draw();boardRenderer.dispose();exports[5].resolve({tempFilePath:'closed-frame'});await closing;
   assert.equal(boardPage.data.boardFrames[0].src,'previous-landing','Exports finishing after exit cannot change the board');
   boardRenderer.frameReady(1,'closed-frame');assert.equal(boardPage.data.boardFront,0);
-  console.log('Passed rendering: three atlas grids, view-coordinate export, retry, cancellation and asynchronous board frames.');
+  // A rapid zoom -> fit must discard the zoom while its view update is pending.
+  const commits=[],sizeExports=[];let viewWidth=350,viewHeight=262.5;
+  const sizePage={data:{boardWidth:350,boardHeight:262.5},store:{state:{current}},setData(patch,callback){Object.assign(this.data,patch);if(callback)commits.push(()=>{viewWidth=patch.boardWidth;viewHeight=patch.boardHeight;callback();});},fail(e){throw e;}};
+  const sizing=new Renderer(sizePage);sizing.canvas=board;sizing.ctx=context;sizing.img={};sizing.viewWidth=350;sizing.viewHeight=262.5;
+  Media.invoke=async(method,args)=>{assert.equal(args.width,viewWidth,'Export must match the committed board view width');assert.equal(args.height,viewHeight);sizeExports.push(args.width);return {tempFilePath:'size-'+args.width};};
+  sizePage.data.boardWidth=577.5;const zoom=sizing.draw();assert.equal(sizeExports.length,0,'Zoom waits for view commit');
+  sizePage.data.boardWidth=350;const fit=sizing.draw();assert.equal(sizeExports.length,0);
+  commits.shift()();await zoom;commits.shift()();await fit;
+  assert.deepEqual(sizeExports,[350],'Late zoom must not replace fit');sizing.frameReady(1,'size-350');
+  for(let n=0;n<3;n++){
+   sizePage.data.boardWidth=577.5;const enlarge=sizing.draw();commits.shift()();await enlarge;
+   sizePage.data.boardWidth=350;const shrink=sizing.draw();commits.shift()();await shrink;
+   assert.equal(sizing.pendingFrame.src,'size-350','Repeated fit must always produce the full-size frame');
+  }
+  console.log('Passed rendering: three atlas grids, board view sizing and rapid/repeated zoom-fit, retry, cancellation and asynchronous board frames.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

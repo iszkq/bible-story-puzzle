@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-14T15:38:48.311Z",
+  "checks": [
+    "Cycle 1: actual two-axis board movement, fit size/origin and full 4:3 frame",
+    "Cycle 2: actual two-axis board movement, fit size/origin and full 4:3 frame",
+    "Cycle 3: actual two-axis board movement, fit size/origin and full 4:3 frame",
+    "User game restored exactly"
+  ],
+  "errors": []
+}

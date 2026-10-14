@@ -43,13 +43,13 @@ try{
  });
  check('iOS preview sheet: fit, zoom, scroll, close, same session',()=>{
   act('preview');assert.equal(data('previewOpen'),true);assert.equal(data('previewLoading'),false);assert.match(data('previewPath'),/moses.jpg/);shot('wechat-ios-preview-fit');
-  method('previewZoom');assert.equal(data('previewLarge'),true);call('automation_element_action',{action:'scrollTo',selector:'.preview-window',x:200,y:100});shot('wechat-ios-preview-zoom');method('previewZoom');method('closePreview');assert.equal(data('screen'),'prepare');
+  method('previewZoom');assert.equal(data('previewLarge'),true);method('previewPanStart',{touches:[{clientX:250,clientY:250}]});method('previewPanMove',{touches:[{clientX:50,clientY:150}]});method('previewPanEnd');shot('wechat-ios-preview-zoom');method('previewZoom');method('closePreview');assert.equal(data('screen'),'prepare');
  });
  for(const count of (process.env.QA_GRID ? [Number(process.env.QA_GRID)] : [12,24,48]))check(count+' pieces: drag, neutral placement, occupied swap, cancel, adjustment, zoom, preview, pause/resume',()=>{
   game(count);touchDrop(0,1,count);touchDrop(1,1,count);let c=data('current');assert(!c.positions[0]);assert.equal(c.positions[1].slot,1);
   method('selectPiece',{currentTarget:{dataset:{id:1}}});act('adjust');act('move','right');act('return');assert(!data('current').positions[1]);act('closeAdjust');
   touchDrop(0,0,count);method('cancelDrag');const before=snapshot();act('preview');assert.equal(data('previewLoading'),false);method('closePreview');assert.equal(snapshot(),before);
-  act('zoom');assert.equal(data('current').zoom,true);act('pan');assert.equal(data('current').panMode,true);call('automation_element_action',{action:'scrollTo',selector:'#board-window',x:100,y:50});act('pan');act('zoom');
+  act('zoom');assert.equal(data('current').zoom,true);act('pan');assert.equal(data('current').panMode,true);method('boardStart',{touches:[{clientX:200,clientY:300}]});method('touchMove',{touches:[{clientX:100,clientY:250}]});method('touchEnd',{changedTouches:[{clientX:100,clientY:250}]});assert(data('current').panX>0);act('pan');act('zoom');
   tap('[data-action=pause]');assert.equal(data('modalTitle'),'已暂停');method('modalConfirm');assert.equal(data('screen'),'puzzle');
   const saved=snapshot();act('exit');act('resume');awaitReady();assert.equal(snapshot(),saved);assertClean();shot('wechat-full-'+count);
  });

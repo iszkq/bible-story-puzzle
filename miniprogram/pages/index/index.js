@@ -2,7 +2,7 @@
 const Shared=require('../../shared'),Store=require('../../store'),Media=require('../../media'),Renderer=require('../../renderer');
 const ROOTS=['home','collection','mysets'];
 Page({
-  data:{modalOpen:false,modalTitle:'',modalContent:'',modalConfirm:'',modalCancel:'',previewOpen:false,previewLarge:false,previewPath:'',previewError:'',previewLoading:false,previewMaxHeight:430,previewX:0,previewY:0,previewBack:'返回拼图',cropWidth:1600,cropHeight:1200,screen:'welcome',busy:false,error:'',notice:'',selected:null,adjusting:false,homeScene:'',dragging:false,ghost:null,boardFrames:[{key:'empty-0',src:''},{key:'empty-1',src:''}],boardFront:0,atlas:'',atlasRows:3,atlasWidth:576,atlasHeight:432,filter:'saved',count:12,baseWidth:335,boardWidth:335,boardHeight:251.25,boardWindowHeight:251.25,panX:0,panY:0,trayScroll:0,dark:false,difficulties:[{count:12,label:'轻松',grid:'4列 × 3行'},{count:24,label:'标准',grid:'6列 × 4行'},{count:48,label:'困难',grid:'8列 × 6行'}],safeBottom:0},
+  data:{trayTouch:false,previewZoomWidth:760,previewZoomHeight:570,modalOpen:false,modalTitle:'',modalContent:'',modalConfirm:'',modalCancel:'',previewOpen:false,previewLarge:false,previewPath:'',previewError:'',previewLoading:false,previewMaxHeight:430,previewX:0,previewY:0,previewBack:'返回拼图',cropWidth:1600,cropHeight:1200,screen:'welcome',busy:false,error:'',notice:'',selected:null,adjusting:false,homeScene:'',dragging:false,ghost:null,boardFrames:[{key:'empty-0',src:''},{key:'empty-1',src:''}],boardFront:0,atlas:'',atlasRows:3,atlasWidth:576,atlasHeight:432,filter:'saved',count:12,baseWidth:335,boardWidth:335,boardHeight:251.25,boardWindowHeight:251.25,panX:0,panY:0,trayScroll:0,dark:false,difficulties:[{count:12,label:'轻松',grid:'4列 × 3行'},{count:24,label:'标准',grid:'6列 × 4行'},{count:48,label:'困难',grid:'8列 × 6行'}],safeBottom:0},
   onLoad(){
     this.store=Store.createStore(wx);this.renderer=new Renderer(this);this.storyID=1;this.setID=null;this.itemID=null;
     const info=wx.getWindowInfo(),width=info.windowWidth-(info.windowWidth<=375?32:40);
@@ -90,13 +90,30 @@ Page({
   },
   async preview(){
     this.cancelDrag();
+    this.previewPan=null;
     const serial=this.previewSerial=(this.previewSerial||0)+1;
     this.setData({previewOpen:true,previewLarge:false,previewPath:'',previewError:'',previewLoading:true,previewX:0,previewY:0,previewBack:this.screen==='prepare'?'返回关卡准备':this.screen==='detail'?'返回详情':this.screen==='reveal'?'返回故事':'返回拼图'});
     try{const path=await Media.scene(this.story());if(serial===this.previewSerial&&this.data.previewOpen)this.setData({previewPath:path});}
     catch(e){if(serial===this.previewSerial)this.setData({previewError:e.message||'图片未能显示，请重试。',previewLoading:false});}
   },
-  closePreview(){this.previewSerial=(this.previewSerial||0)+1;this.setData({previewOpen:false,previewPath:'',previewError:'',previewLoading:false});},
-  previewZoom(){this.setData({previewLarge:!this.data.previewLarge,previewX:0,previewY:0});},
+  closePreview(){this.previewPan=null;this.previewSerial=(this.previewSerial||0)+1;this.setData({previewOpen:false,previewPath:'',previewError:'',previewLoading:false,previewX:0,previewY:0});},
+  previewZoom(){
+    this.previewPan=null;
+    const width=Math.max(760,this.data.baseWidth*2);
+    this.setData({previewLarge:!this.data.previewLarge,previewZoomWidth:width,previewZoomHeight:width*.75,previewX:0,previewY:0});
+  },
+  previewPanStart(e){
+    const t=this.point(e);this.previewPan=null;
+    if(!this.data.previewOpen||!this.data.previewLarge||!t)return;
+    this.previewPan={x:t.clientX,y:t.clientY,offsetX:this.data.previewX,offsetY:this.data.previewY};
+  },
+  previewPanMove(e){
+    const pan=this.previewPan,t=this.point(e);if(!pan||!t||!this.data.previewOpen||!this.data.previewLarge)return;
+    const maxX=Math.max(0,this.data.previewZoomWidth-this.data.baseWidth);
+    const maxY=Math.max(0,this.data.previewZoomHeight-this.data.previewMaxHeight);
+    this.setData({previewX:Math.max(0,Math.min(maxX,pan.offsetX+pan.x-t.clientX)),previewY:Math.max(0,Math.min(maxY,pan.offsetY+pan.y-t.clientY))});
+  },
+  previewPanEnd(){this.previewPan=null;},
   previewReady(e){if(e.currentTarget.dataset.src===this.data.previewPath)this.setData({previewLoading:false,previewError:''});},
   previewFailed(e){if(e.currentTarget.dataset.src===this.data.previewPath)this.setData({previewLoading:false,previewError:'图片未能显示，请重试。'});},
   async start(restart=false){
@@ -123,8 +140,8 @@ Page({
       if(action==='retry'){if(this.screen==='puzzle')await this.loadPuzzle();else if(this.screen==='imageedit')this.scheduleCrop();else if(this.screen==='home'){this.homeKey=null;await this.loadHome(this.data.shown);}else await this.loadScene();return;}
       if(action==='pause'){const again=await this.modal('已暂停','进度已保存。已摆放'+state.current.placed.length+'/'+state.current.count+'块。','继续拼图',state.current.trial?'结束试玩':'返回故事库');if(!again){if(state.current.trial){this.store.endTrial();this.go('imageedit');}else this.go('home');}return;}
       if(action==='exit'){if(state.current&&state.current.trial){this.store.endTrial();this.go('imageedit');}else this.go('home');return;}
-      if(action==='zoom'){state.current.zoom=!state.current.zoom;state.current.panMode=false;state.current.panX=0;state.current.panY=0;this.save();this.render();return;}
-      if(action==='pan'){state.current.panMode=!state.current.panMode;this.save();this.render();return;}
+      if(action==='zoom'){this.cancelDrag(false);state.current.zoom=!state.current.zoom;state.current.panMode=false;state.current.panX=0;state.current.panY=0;this.setData({panX:0,panY:0});this.save();this.render();return;}
+      if(action==='pan'){this.cancelDrag();state.current.panMode=!state.current.panMode;this.save();this.render();return;}
       if(action==='adjust'){this.setData({adjusting:true});return;}
       if(action==='closeAdjust'){this.setData({adjusting:false});return;}
       if(action==='return'){if(this.data.selected!==null){Shared.returnPiece(state.current,this.data.selected);this.setData({selected:null});this.save();this.render();}return;}
@@ -226,29 +243,61 @@ Page({
   },
   scroll(e){
     const c=this.store.state.current;if(!c||this.screen!=='puzzle')return;
-    if(e.currentTarget.dataset.area==='tray')c.trayScroll=e.detail.scrollTop;
-    else{c.panX=e.detail.scrollLeft;c.panY=e.detail.scrollTop;}
+    if(e.currentTarget.dataset.area==='tray'){
+      // A piece gesture owns its scroll offset; ignore delayed native echoes.
+      if(this.trayBrowse||(this.drag&&!this.drag.board))return;
+      c.trayScroll=e.detail.scrollTop;
+    }
+    else return; // Board panning owns offsets; delayed native events cannot undo fit.
     clearTimeout(this.scrollTimer);this.scrollTimer=setTimeout(()=>{this.save();this.measure();},120);
   },
-  point(e){return (e.changedTouches&&e.changedTouches[0])||(e.touches&&e.touches[0]);},
+  point(e){return e.type==='touchend'||e.type==='touchcancel'?(e.changedTouches&&e.changedTouches[0]):(e.touches&&e.touches[0])||(e.changedTouches&&e.changedTouches[0]);},
   boardStart(e){
-    const c=this.store.state.current;if(this.data.busy||!this.boardRect||!c||c.panMode)return;
+    const c=this.store.state.current;if(this.data.busy||!this.boardRect||!c)return;
     const t=this.point(e),x=t.clientX-this.boardRect.left,y=t.clientY-this.boardRect.top;
-    const id=this.renderer.hit(x,y);
     this.cancelDrag(false);
+    const id=c.panMode?null:this.renderer.hit(x,y);
+    if(c.zoom&&(c.panMode||id===null)){
+      this.boardPan={x:t.clientX,y:t.clientY,offsetX:this.data.panX,offsetY:this.data.panY,moved:false};return;
+    }
     this.drag={id,startX:t.clientX,startY:t.clientY,active:false,board:true};if(id!==null&&this.data.selected===null){this.setData({selected:id});this.renderer.draw();}
   },
-  trayStart(e){if(this.data.busy)return;const t=this.point(e);this.cancelDrag(false);this.drag={id:Number(e.currentTarget.dataset.id),startX:t.clientX,startY:t.clientY,active:false,board:false};this.setData({selected:this.drag.id});},
+  trayStart(e){if(this.data.busy)return;const t=this.point(e);this.cancelDrag(false);this.ignorePieceTap=false;this.drag={id:Number(e.currentTarget.dataset.id),startX:t.clientX,startY:t.clientY,active:false,board:false};this.setData({selected:this.drag.id,trayTouch:true});},
+  trayBrowseStart(e){if(this.data.busy)return;const t=this.point(e);this.cancelDrag();this.trayBrowse={startY:t.clientY,startScroll:this.store.state.current.trayScroll||0};},
+  trayBrowseMove(e){
+    const browse=this.trayBrowse,t=this.point(e);if(!browse||!t)return;
+    const height=this.trayRect?this.trayRect.height:216;
+    const max=Math.max(0,Math.ceil(this.data.tray.length/4)*this.data.trayPieceHeight-height);
+    const offset=Math.max(0,Math.min(max,browse.startScroll+browse.startY-t.clientY));
+    this.store.state.current.trayScroll=offset;this.setData({trayScroll:offset});
+  },
+  trayBrowseEnd(){if(!this.trayBrowse)return;this.trayBrowse=null;this.save();this.measure();},
   trayLong(){if(this.drag)this.activateDrag();},
-  activateDrag(){if(!this.drag||this.drag.id===null)return;this.drag.active=true;this.setData({dragging:true,selected:this.drag.id});this.renderer.draw();},
+  activateDrag(){if(!this.drag||this.drag.id===null)return;this.drag.active=true;this.ignorePieceTap=true;this.setData({dragging:true,selected:this.drag.id});this.renderer.draw();},
   touchMove(e){
+    if(this.boardPan){
+      const pan=this.boardPan,t=this.point(e),c=this.store.state.current;if(!t||!c||!c.zoom)return;
+      const dx=pan.x-t.clientX,dy=pan.y-t.clientY;
+      if(!pan.moved&&Math.hypot(dx,dy)<=6)return;
+      pan.moved=true;
+      c.panX=Math.max(0,Math.min(this.data.boardWidth-this.data.baseWidth,pan.offsetX+dx));
+      c.panY=Math.max(0,Math.min(this.data.boardHeight-this.data.boardWindowHeight,pan.offsetY+dy));
+      this.setData({panX:c.panX,panY:c.panY});return;
+    }
     const d=this.drag,t=this.point(e);if(!d||d.id===null||!t)return;
     const dx=t.clientX-d.startX,dy=t.clientY-d.startY;
-    if(!d.active){if(d.board&&Math.hypot(dx,dy)>6)this.activateDrag();else if(!d.board&&Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy))this.activateDrag();else return;}
+    if(!d.active){if(Math.hypot(dx,dy)>6)this.activateDrag();else return;}
     const w=this.data.cellWidth*1.44,h=this.data.cellHeight*1.44;
     this.setData({ghost:{id:d.id,col:d.id%4,row:Math.floor(d.id/4),left:t.clientX-w/2,top:t.clientY-24-h/2,width:w,height:h}});
   },
   touchEnd(e){
+    if(this.boardPan){
+      const pan=this.boardPan,t=this.point(e),c=this.store.state.current;this.boardPan=null;
+      if(!pan.moved&&t&&c&&!c.panMode&&this.data.selected!==null){
+        Shared.dropPiece(c,this.data.selected,(t.clientX-this.boardRect.left)/this.boardRect.width,(t.clientY-this.boardRect.top)/this.boardRect.height);this.feedback();this.render();
+      }
+      this.save();wx.nextTick(()=>this.measure());return;
+    }
     const d=this.drag,t=this.point(e),c=this.store.state.current;if(!d||!t||!c)return;
     let changed=false;
     if(d.active){
@@ -260,12 +309,13 @@ Page({
     if(changed&&d.active&&c.positions[d.id]){
       const {cols,rows}=Shared.gridFor(c.count),cw=this.data.boardWidth/cols,ch=this.data.boardHeight/rows,slot=c.positions[d.id].slot;
       this.drag=null;this.handoff={};
+      this.setData({trayTouch:false});
       this.setData({dragging:false,ghost:{id:d.id,col:d.id%4,row:Math.floor(d.id/4),left:this.boardRect.left+(slot%cols)*cw-.22*cw,top:this.boardRect.top+Math.floor(slot/cols)*ch-.22*ch,width:cw*1.44,height:ch*1.44,settled:true}});
     }else this.cancelDrag(false);
     if(changed){this.save();this.feedback();this.render();}else this.renderer.draw();
   },
-  cancelDrag(redraw=true){const active=this.drag&&this.drag.active;this.drag=null;this.handoff=null;this.setData({dragging:false,ghost:null});if(active&&redraw)this.renderer.draw();},
-  selectPiece(e){this.setData({selected:Number(e.currentTarget.dataset.id)});this.renderer.draw();},
+  cancelDrag(redraw=true){const active=this.drag&&this.drag.active;this.drag=null;this.boardPan=null;this.trayBrowse=null;this.handoff=null;this.setData({dragging:false,trayTouch:false,ghost:null});if(active&&redraw)this.renderer.draw();},
+  selectPiece(e){if(this.ignorePieceTap)return;this.setData({selected:Number(e.currentTarget.dataset.id)});this.renderer.draw();},
   boardFrameLoaded(e){this.renderer.frameReady(Number(e.currentTarget.dataset.buffer),e.currentTarget.dataset.src);},
   boardFrameError(e){this.renderer.frameError(Number(e.currentTarget.dataset.buffer),e.currentTarget.dataset.src);},
   noop(){},

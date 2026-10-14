@@ -32,6 +32,17 @@ class Renderer{
     if(!this.ctx||!this.img)return;
     const page=this.page,c=page.store.state.current;if(!c)return;
     const dpr=wx.getWindowInfo().pixelRatio||1,w=page.data.boardWidth,h=w*.75;
+    const serial=this.serial,frame=this.frameSerial=(this.frameSerial||0)+1,handoff=page.handoff;
+    // Native export uses view coordinates. A zoom/fit must commit the hidden
+    // canvas view size before touching its backing pixels or exporting it.
+    if(this.viewWidth!==w||this.viewHeight!==h){
+      // A second resize must commit too, even if it returns to the last size
+      // while the first resize is still waiting on the view layer.
+      this.viewWidth=null;this.viewHeight=null;
+      await new Promise(resolve=>page.setData({boardWidth:w,boardHeight:h},resolve));
+      if(serial!==this.serial||frame!==this.frameSerial||!this.ctx)return;
+      this.viewWidth=w;this.viewHeight=h;
+    }
     this.canvas.width=Math.round(w*dpr);this.canvas.height=Math.round(h*dpr);
     const ctx=this.ctx;ctx.scale(dpr,dpr);
     ctx.fillStyle=page.data.dark?'#1c1c1e':'#fff';ctx.fillRect(0,0,w,h);
@@ -40,7 +51,6 @@ class Renderer{
     for(let i=0;i<=cols;i++){ctx.beginPath();ctx.moveTo(i*cw,0);ctx.lineTo(i*cw,h);ctx.stroke();}
     for(let i=0;i<=rows;i++){ctx.beginPath();ctx.moveTo(0,i*ch);ctx.lineTo(w,i*ch);ctx.stroke();}
     for(const id of c.placed){if(page.drag&&page.drag.active&&page.drag.id===id)continue;const p=c.positions[id],x=(p.slot%cols)*cw,y=Math.floor(p.slot/cols)*ch;paintPiece(ctx,this.img,id,c.count,x,y,cw,ch);if(page.data.selected===id){ctx.strokeStyle=page.data.dark?'#0a84ff':'#007aff';ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,cw-2,ch-2);}}
-    const serial=this.serial,frame=this.frameSerial=(this.frameSerial||0)+1,handoff=page.handoff;
     try{
       const result=await Media.invoke('canvasToTempFilePath',{canvas:this.canvas,fileType:'png',width:w,height:h,destWidth:this.canvas.width,destHeight:this.canvas.height});
       if(serial===this.serial&&frame===this.frameSerial){
@@ -70,6 +80,6 @@ class Renderer{
     for(const id of [...c.placed].reverse()){const p=c.positions[id];Shared.drawPath(hit,id,c.count);if(hit.isPointInPath((x-(p.slot%cols)*cw)/cw*100,(y-Math.floor(p.slot/cols)*ch)/ch*100))return id;}
     return null;
   }
-  dispose(){this.serial++;this.ctx=null;this.img=null;}
+  dispose(){this.serial++;this.ctx=null;this.img=null;this.viewWidth=null;this.viewHeight=null;}
 }
 module.exports=Renderer;
