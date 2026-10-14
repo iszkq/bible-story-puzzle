@@ -1,5 +1,5 @@
 from pathlib import Path
-import json, plistlib, re, xml.etree.ElementTree as ET
+import json, plistlib, re, struct, xml.etree.ElementTree as ET
 
 root=Path(__file__).resolve().parents[1]
 app=root/'ios/BibleStoryPuzzle'
@@ -17,7 +17,11 @@ scene_names=json.loads(re.search(r'const sceneNames=(\[[^;]+\]);',(root/'web/sha
 for name in scene_names+['welcome']: assert (app/'Web/assets'/f'{name}.jpg').read_bytes()==(root/'web/assets'/f'{name}.jpg').read_bytes()
 assert not (app/'Web/assets/originals').exists(), 'App should omit large source masters'
 icons=json.loads((app/'Assets.xcassets/AppIcon.appiconset/Contents.json').read_text())
-for icon in icons['images']: assert (app/'Assets.xcassets/AppIcon.appiconset'/icon['filename']).is_file()
+for icon in icons['images']:
+    icon_path=app/'Assets.xcassets/AppIcon.appiconset'/icon['filename']
+    assert icon_path.is_file()
+    data=icon_path.read_bytes()
+    assert data[:8]==b'\x89PNG\r\n\x1a\n' and struct.unpack('>II',data[16:24])==(1024,1024), 'App icon must be 1024x1024 PNG'
 info=plistlib.loads((app/'Info.plist').read_bytes())
 assert info['NSAppTransportSecurity'].get('NSAllowsArbitraryLoads') is not True
 manifest=json.loads((root/'docs/design-system/manifest.json').read_text(encoding='utf-8'))
